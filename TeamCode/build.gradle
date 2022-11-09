@@ -22,4 +22,11 @@ android {
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+    // implementation 'org.ftclib.ftclib:core:2.0.1'
+}
+
+git {
+    implementation 'https://github.com/ftc-saturn9944/FTCLib.git', {
+        projectPath '/core'
+    }
 }

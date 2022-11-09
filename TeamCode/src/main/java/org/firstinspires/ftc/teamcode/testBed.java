@@ -1,17 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.arcrobotics.ftclib.hardware.SensorRevTOFDistance;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -31,7 +29,7 @@ public class testBed extends LinearOpMode {
 
     // ** I2C
     public RevColorSensorV3 color1;
-    public Rev2mDistanceSensor dist1;
+    public SensorRevTOFDistance dist1;
 
     // ** Digital
     public RevTouchSensor touch1;
@@ -45,15 +43,18 @@ public class testBed extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        testMotor = hardwareMap.get(DcMotorEx.class, "MOTOR1");
-        linear1 = hardwareMap.get(Servo.class, "Linear");
-        carousel1 = hardwareMap.get(Servo.class, "Rotation");
-
-        color1 = hardwareMap.get(RevColorSensorV3.class, "ColorV3");
-        dist1 = hardwareMap.get(Rev2mDistanceSensor.class, "Distance1");
-
-        touch1 = hardwareMap.get(RevTouchSensor.class, "Touch1");
-        touch2 = hardwareMap.get(RevTouchSensor.class, "Touch2");
+//        testMotor = hardwareMap.get(DcMotorEx.class, "MOTOR1");
+//        linear1 = hardwareMap.get(Servo.class, "Linear");
+//        carousel1 = hardwareMap.get(Servo.class, "Rotation");
+//
+//        color1 = hardwareMap.get(RevColorSensorV3.class, "ColorV3");
+        dist1 = new SensorRevTOFDistance(hardwareMap, "Distance1");
+        double targetDist = 100.0;
+        double thresh = 5;
+        SensorRevTOFDistance.DistanceTarget target1 = new SensorRevTOFDistance.DistanceTarget(DistanceUnit.MM, targetDist, thresh);
+        dist1.addTarget(target1);
+//        touch1 = hardwareMap.get(RevTouchSensor.class, "Touch1");
+//        touch2 = hardwareMap.get(RevTouchSensor.class, "Touch2");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -66,26 +67,26 @@ public class testBed extends LinearOpMode {
         runtime.reset();
 
         while(opModeIsActive()) {
-            double dist = dist1.getDistance(DistanceUnit.INCH);
-
-            if (distCalc.size() == DIST_COUNT) {
-                distCalc.remove(0);
-            }
-            distCalc.add(dist);
-            double distAvg = distCalc.stream()
-                    .mapToDouble(a -> a)
-                    .sum() / DIST_COUNT;
-
+            double dist = dist1.getDistance(DistanceUnit.MM);
+            double threshold = target1.getThreshold();
+            double targetRange = target1.getTarget();
             telemetry.addData("Dist1 in:", dist);
-            telemetry.addData("Dist1 in avg", distAvg);
-            telemetry.addData("ColorDist in:" , color1.getDistance(DistanceUnit.INCH));
-            telemetry.addData("ColorR:" , color1.red());
-            telemetry.addData("ColorG:", color1.green());
-            telemetry.addData("ColorB:", color1.blue());
-            telemetry.addData("ColorA:", color1.alpha());
-            telemetry.addData("Color argb:", color1.argb());
-            telemetry.addData("Touch1:", touch1.isPressed());
-            telemetry.addData("Touch2:", touch2.isPressed());
+            telemetry.addData("Targeting", targetRange);
+            telemetry.addData("Threshold", threshold);
+            telemetry.addData("Clipped", Range.clip(dist, dist + threshold, dist - threshold));
+            telemetry.addData("Units", target1.getUnit().toString());
+            telemetry.addData("1st Target", dist1.targetReached(target1));
+            telemetry.addData("Lib At Target", target1.atTarget(dist));
+            telemetry.addData("At Any Target", dist1.checkAllTargets());
+
+//            telemetry.addData("ColorDist in:" , color1.getDistance(DistanceUnit.INCH));
+//            telemetry.addData("ColorR:" , color1.red());
+//            telemetry.addData("ColorG:", color1.green());
+//            telemetry.addData("ColorB:", color1.blue());
+//            telemetry.addData("ColorA:", color1.alpha());
+//            telemetry.addData("Color argb:", color1.argb());
+//            telemetry.addData("Touch1:", touch1.isPressed());
+//            telemetry.addData("Touch2:", touch2.isPressed());
             telemetry.update();
         }
     }

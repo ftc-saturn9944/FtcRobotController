@@ -1,2 +1,12 @@
+//sourceControl {
+//    gitRepository("https://github.com/ftc-saturn9944/FTCLib.git") {
+//        producesModule("org.ftclib.ftclib:core")
+//    }
+//}
+
+plugins {
+    id 'com.alexvasilkov.git-dependencies' version '2.0.4'
+}
+
 include ':FtcRobotController'
 include ':TeamCode'
