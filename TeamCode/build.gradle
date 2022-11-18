@@ -27,6 +27,7 @@ dependencies {
 
 git {
     implementation 'https://github.com/ftc-saturn9944/FTCLib.git', {
+        commit 'origin/master'
         projectPath '/core'
     }
 }
