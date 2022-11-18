@@ -61,6 +61,11 @@ public class testBed extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        DistanceList scoringList = new DistanceList();
+
+        scoringList.addTarget("Junction", 1.0, 0.0625);
+        scoringList.addTarget("Low", 5.0, true);
+        SensorRevTOFDistance.DistanceTarget curr = scoringList.getCurrent();
         ArrayList<Double> distCalc = new ArrayList<Double>();
         Integer DIST_COUNT = 5;
         waitForStart();
