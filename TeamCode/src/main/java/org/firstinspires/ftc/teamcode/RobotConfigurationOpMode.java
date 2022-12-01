@@ -47,10 +47,13 @@ public class RobotConfigurationOpMode extends CommandOpMode {
     private Button r_wristButton;
     private RotateWrist r_wristCommand;
 
+    private RevIMU imu;
     public void initialize() {
         driverOp = new GamepadEx(gamepad1);
         toolOp = new GamepadEx(gamepad2);
 
+        imu = new RevIMU(hardwareMap);
+        imu.init();
         SensorRevTOFDistance liftDistance = new SensorRevTOFDistance(hardwareMap, "LIFTDISTANCE");
         ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 90);
         ServoEx wristServo = new SimpleServo(hardwareMap, "WRIST", 0, 180);
@@ -58,24 +61,26 @@ public class RobotConfigurationOpMode extends CommandOpMode {
                 new MotorEx(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "RIGHTFRONT", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
-                new MotorEx(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435)
+                new MotorEx(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435),
+                imu,
+                false
         );
         gripper = new GripperSubsystem(gripServo);
         m_grabCommand = new GripperGrab(gripper);
         m_releaseCommand = new GripperRelease(gripper);
-        m_grabButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
+        m_grabButton = (new GamepadButton(toolOp, GamepadKeys.Button.B))
                 .whenPressed(m_grabCommand);
-        m_releaseButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
+        m_releaseButton = (new GamepadButton(toolOp, GamepadKeys.Button.Y))
                 .whenPressed(m_releaseCommand);
 
         lift = new LiftSubsystem(hardwareMap, "LIFTDISTANCE", "LIFTMOTOR");
         l_liftCommand = new LowerLift(lift);
         r_liftCommand = new RaiseLift(lift);
         s_liftCommand = new StopLift(lift);
-        r_liftButton = (new GamepadButton(driverOp, GamepadKeys.Button.RIGHT_BUMPER))
+        r_liftButton = (new GamepadButton(toolOp, GamepadKeys.Button.RIGHT_BUMPER))
                 .whileHeld(r_liftCommand)
                 .whenReleased(s_liftCommand);
-        l_liftButton = (new GamepadButton(driverOp, GamepadKeys.Button.LEFT_BUMPER))
+        l_liftButton = (new GamepadButton(toolOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whileHeld(l_liftCommand)
                 .whenReleased(s_liftCommand);
 
@@ -84,7 +89,7 @@ public class RobotConfigurationOpMode extends CommandOpMode {
 
         wrist = new WristSubsystem(wristServo);
         r_wristCommand = new RotateWrist(wrist);
-        r_wristButton = (new GamepadButton(driverOp, GamepadKeys.Button.X))
+        r_wristButton = (new GamepadButton(toolOp, GamepadKeys.Button.X))
                 .whenPressed(r_wristCommand);
 
         m_driveCommand = new DefaultDrive(
