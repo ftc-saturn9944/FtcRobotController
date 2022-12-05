@@ -93,15 +93,17 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 
             if (bmp != null) {
 
-                for(int y = 0; y < 480; y++){
-                    for(int x = 0; x < 640; x+=4){
+                int y = 275;
+                    for(int x = 270; x < 280; x+=2){
                         int pixel = bmp.getPixel(x,y);
 
                         int r = Color.red(pixel);
                         int g = Color.green(pixel);
                         int b = Color.blue(pixel);
 
-                        if(80 < r && r < 95 && 110 < g && g < 130 && 60 < b && b <80 && y < 240){
+                        telemetry.addData("RGB:", r + ", " + g + ", " + b);
+
+                        /*if(80 < r && r < 95 && 110 < g && g < 130 && 60 < b && b <80 && y < 240){
                             telemetry.addData("TSE:", x + " " + y);
                             telemetry.update();
                             if( x < 215){
@@ -109,7 +111,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
                             } else if (x > 300 && x < 505){
                                 level = 2;
                             }
-                        }
+                        }*/
 
 
                         //telemetry.addData("RGB", r + ", " + g + ", " + b);
@@ -119,7 +121,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
                         //telemetry.addData(">", "Not found");
                         //telemetry.update();
                     }
-                }
+
                 //onNewFrame(bmp);
             }
 
