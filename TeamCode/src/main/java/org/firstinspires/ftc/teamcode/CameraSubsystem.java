@@ -51,6 +51,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
         private Camera camera;
         private CameraCaptureSession cameraCaptureSession;
 
+        private Bitmap bmp;
         /** The queue into which all frames from the camera are placed as they become available.
          * Frames which are not processed by the OpMode are automatically discarded. */
         private EvictingBlockingQueue<Bitmap> frameQueue;
@@ -65,7 +66,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
         private Handler callbackHandler;
 
 
-        public void cameraSubsystem (HardwareMap hMap, String webcam){
+        public CameraSubsystem (HardwareMap hMap, String webcam){
 
             callbackHandler = CallbackLooper.getDefault().getHandler();
 
@@ -76,32 +77,74 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
             AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
         }
+    public boolean isFinished(){
+        return true;
+    }
 
+        public void initializeCamera() {
+            openCamera();
+            startCamera();
+        }
         public Bitmap capture(){
 
             openCamera();
             startCamera();
             Bitmap bmp = frameQueue.poll();
+
             closeCamera();
 
             return bmp;
         }
 
+        public int[] getRGBData(){
+            startCamera();
+            bmp = frameQueue.poll();
+            if (bmp != null) {
+                int y = 275;
+                for (int x = 270; x < 280; x += 2) {
+                    int pixel = bmp.getPixel(x, y);
+
+                    int r = Color.red(pixel);
+                    int g = Color.green(pixel);
+                    int b = Color.blue(pixel);
+                    return new int[]{r, g, b};
+                }
+                onNewFrame(bmp);
+            }
+            return new int[]{-1, -1, -1};
+        }
+
+        public String getRGBDataString() {
+            int[] rgb = this.getRGBData();
+            return rgb[0] + ", " + rgb[1] + ", " + rgb[2];
+        }
+
+        public String detectColor (){
+            int[] rgb = this.getRGBData();
+            int r = rgb[0];
+            int g = rgb[1];
+            int b = rgb[2];
+
+            if ((r > 75 && r < 85) && (g > 110 && g < 130) && (b > 80 && b < 100)) {
+                return "Green";
+            } else if ((r > 210 && r < 230) && (g > 200 && g < 225) && (b > 100 && b < 120)) {
+                return "Yellow";
+            } else if ((r > 85 && r < 105) && (g > 54 && g < 70) && (b > 85 && b < 100)) {
+                return "Purple";
+            } else {
+                return "Unknown";
+            }
+        }
+
+        private void onNewFrame(Bitmap frame) {
+            //saveBitmap(frame);
+            frame.recycle(); // not strictly necessary, but helpful
+        }
         public int getParking(Bitmap bmp){
 
             int level = 3;
 
             if (bmp != null) {
-
-                int y = 275;
-                    for(int x = 270; x < 280; x+=2){
-                        int pixel = bmp.getPixel(x,y);
-
-                        int r = Color.red(pixel);
-                        int g = Color.green(pixel);
-                        int b = Color.blue(pixel);
-
-                        telemetry.addData("RGB:", r + ", " + g + ", " + b);
 
                         /*if(80 < r && r < 95 && 110 < g && g < 130 && 60 < b && b <80 && y < 240){
                             telemetry.addData("TSE:", x + " " + y);
@@ -120,7 +163,6 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
                         //sleep(10000);
                         //telemetry.addData(">", "Not found");
                         //telemetry.update();
-                    }
 
                 //onNewFrame(bmp);
             }
@@ -243,12 +285,12 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
         //----------------------------------------------------------------------------------------------
 
         private void error(String msg) {
-            telemetry.log().add(msg);
-            telemetry.update();
+//            telemetry.log().add(msg);
+//            telemetry.update();
         }
         private void error(String format, Object...args) {
-            telemetry.log().add(format, args);
-            telemetry.update();
+//            telemetry.log().add(format, args);
+//            telemetry.update();
         }
 
         private boolean contains(int[] array, int value) {

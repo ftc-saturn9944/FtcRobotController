@@ -89,9 +89,8 @@ import java.util.concurrent.TimeUnit;
 
             callbackHandler = CallbackLooper.getDefault().getHandler();
 
-            org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager CameraManager = ClassFactory.getInstance().getCameraManager();
+            cameraManager = ClassFactory.getInstance().getCameraManager();
             cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-
             initializeFrameQueue(2);
             AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 

@@ -13,6 +13,7 @@ import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -47,6 +48,9 @@ public class RobotConfigurationOpMode extends CommandOpMode {
     private Button r_wristButton;
     private RotateWrist r_wristCommand;
 
+    private CameraSubsystem camera;
+    private AutoPark m_park;
+
     public void initialize() {
         driverOp = new GamepadEx(gamepad1);
         toolOp = new GamepadEx(gamepad2);
@@ -78,9 +82,12 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         l_liftButton = (new GamepadButton(driverOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whileHeld(l_liftCommand)
                 .whenReleased(s_liftCommand);
-
-
         lift.setDefaultCommand(s_liftCommand);
+
+        camera = new CameraSubsystem(hardwareMap, "Webcam 1");
+        camera.initializeCamera();
+        m_park = new AutoPark(camera);
+
 
         wrist = new WristSubsystem(wristServo);
         r_wristCommand = new RotateWrist(wrist);
@@ -101,6 +108,8 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         telemetry.update();
         register(gripper, drive, lift, wrist);
         drive.setDefaultCommand(m_driveCommand);
+
+        //camera.setDefaultCommand(m_park);
     }
 
     @Override
@@ -110,6 +119,8 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         telemetry.addData("LiftSensor", lift::getDistance);
         telemetry.addData("LiftTargetName", lift::getTargetName);
         telemetry.addData("LiftTargetDist", lift::getTargetDist);
+        telemetry.addData("RGB", camera::getRGBDataString);
+        telemetry.addData("Target", camera::detectColor);
         telemetry.update();
         super.run();
     }
