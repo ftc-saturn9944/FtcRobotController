@@ -10,13 +10,21 @@ public class MecanumSubsystem extends SubsystemBase {
 
     private final MecanumDrive m_drive;
     private final RevIMU m_imu;
-    private final Boolean m_field;
+    private static Boolean m_field;
 
 
     public MecanumSubsystem(MotorEx leftFront, MotorEx rightFront, MotorEx leftRear, MotorEx rightRear, RevIMU imu, Boolean field) {
         m_drive = new MecanumDrive(leftFront, rightFront, leftRear, rightRear);
         m_imu = imu;
         m_field = field;
+    }
+
+    public void swapDriveMethod() {
+        m_field = !m_field;
+    }
+
+    public Boolean getDriveMethod() {
+        return m_field;
     }
 
     public void drive(double strafe, double forward, double turn, boolean square, RevIMU imu, Boolean field) {

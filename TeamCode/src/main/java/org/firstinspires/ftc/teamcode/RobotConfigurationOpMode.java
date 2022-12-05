@@ -26,7 +26,7 @@ public class RobotConfigurationOpMode extends CommandOpMode {
     // uses field-centric or robot-centric driving styles. The
     // differences between them can be read here in the docs:
     // https://docs.ftclib.org/ftclib/features/drivebases#control-scheme
-    static final boolean FIELD_CENTRIC = false;
+    static boolean FIELD_CENTRIC = false;
 
     private GamepadEx driverOp, toolOp;
     private GripperSubsystem gripper;
@@ -39,6 +39,7 @@ public class RobotConfigurationOpMode extends CommandOpMode {
 
     private LiftSubsystem lift;
     private Button r_liftButton, l_liftButton;
+    private Button field_toggleButton;
     private RaiseLift r_liftCommand;
     private LowerLift l_liftCommand;
     private StopLift s_liftCommand;
@@ -58,10 +59,10 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 90);
         ServoEx wristServo = new SimpleServo(hardwareMap, "WRIST", 0, 180);
         drive = new MecanumSubsystem(
-                new MotorEx(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
-                new MotorEx(hardwareMap, "RIGHTFRONT", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435),
+                new MotorEx(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
+                new MotorEx(hardwareMap, "RIGHTFRONT", Motor.GoBILDA.RPM_435),
                 imu,
                 false
         );
@@ -84,6 +85,9 @@ public class RobotConfigurationOpMode extends CommandOpMode {
                 .whileHeld(l_liftCommand)
                 .whenReleased(s_liftCommand);
 
+        new GamepadButton(driverOp, GamepadKeys.Button.Y).whenPressed(
+                drive::swapDriveMethod
+        );
 
         lift.setDefaultCommand(s_liftCommand);
 
@@ -94,9 +98,11 @@ public class RobotConfigurationOpMode extends CommandOpMode {
 
         m_driveCommand = new DefaultDrive(
                 drive,
-                () -> -driverOp.getLeftX(),
+                () -> driverOp.getLeftX(),
                 () -> driverOp.getLeftY(),
-                () -> driverOp.getRightX()
+                () -> -driverOp.getRightX(),
+                imu,
+                FIELD_CENTRIC
         );
 
         telemetry.addData("GripperPosition", gripper::getPosition);
@@ -115,6 +121,7 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         telemetry.addData("LiftSensor", lift::getDistance);
         telemetry.addData("LiftTargetName", lift::getTargetName);
         telemetry.addData("LiftTargetDist", lift::getTargetDist);
+        telemetry.addData("Driver Field Centric?", drive::getDriveMethod);
         telemetry.update();
         super.run();
     }
