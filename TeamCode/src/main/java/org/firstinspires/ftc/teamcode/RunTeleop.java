@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
-public class RobotConfigurationOpMode extends CommandOpMode {
+public class RunTeleop extends CommandOpMode {
     // This variable determines whether the following program
     // uses field-centric or robot-centric driving styles. The
     // differences between them can be read here in the docs:
@@ -47,8 +47,6 @@ public class RobotConfigurationOpMode extends CommandOpMode {
     private WristSubsystem wrist;
     private Button r_wristButton;
     private RotateWrist r_wristCommand;
-
-    private CameraSubsystem camera;
 
     private RevIMU imu;
     public void initialize() {
@@ -87,9 +85,6 @@ public class RobotConfigurationOpMode extends CommandOpMode {
                 .whileHeld(l_liftCommand)
                 .whenReleased(s_liftCommand);
 
-        camera = new CameraSubsystem(hardwareMap, "Webcam 1");
-        camera.initializeCamera();
-
         new GamepadButton(driverOp, GamepadKeys.Button.Y).whenPressed(
                 drive::swapDriveMethod
         );
@@ -127,109 +122,7 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         telemetry.addData("LiftTargetName", lift::getTargetName);
         telemetry.addData("LiftTargetDist", lift::getTargetDist);
         telemetry.addData("Driver Field Centric?", drive::getDriveMethod);
-        telemetry.addData("RGB", camera::getRGBDataString);
-        telemetry.addData("Target", camera::getColor);
         telemetry.update();
         super.run();
     }
-    //    @Override
-//    public void runOpMode() throws InterruptedException {
-//        // constructor takes in frontLeft, frontRight, backLeft, backRight motors
-//        // IN THAT ORDER
-//
-//        SensorRevTOFDistance liftDistance = new SensorRevTOFDistance(hardwareMap, "LIFTDISTANCE");
-//        ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 90);
-//        GripperSubsystem gripper = new GripperSubsystem(gripServo);
-//
-//
-//        MecanumDrive drive = new MecanumDrive(
-//                new Motor(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
-//                new Motor(hardwareMap, "RIGHTFRONT", Motor.GoBILDA.RPM_435),
-//                new Motor(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
-//                new Motor(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435)
-//        );
-//
-//        RevIMU imu = new RevIMU(hardwareMap);
-//        imu.init();
-//
-//        // the extended gamepad object
-//        GamepadEx driverOp = new GamepadEx(gamepad1);
-//        Button driverY = new GamepadButton(driverOp, GamepadKeys.Button.Y);
-//        Button driverB = new GamepadButton(driverOp, GamepadKeys.Button.B);
-//        waitForStart();
-//
-//        while (!isStopRequested()) {
-//
-//            Double dist = liftDistance.getDistance(DistanceUnit.CM);
-//            telemetry.addData("Distance", dist);
-//            telemetry.addData("Gripper", gripServo.getPosition());
-//            gripServo.setPosition(0.3);
-//            telemetry.update();
-//
-//            driverY.whenPressed(new InstantCommand(gripper::grab));
-//
-//            driverB.whenPressed(new InstantCommand(gripper::release));
-//
-//            // Driving the mecanum base takes 3 joystick parameters: leftX, leftY, rightX.
-//            // These are related to the left stick x value, left stick y value, and
-//            // right stick x value respectively. These values are passed in to represent the
-//            // strafing speed, the forward speed, and the turning speed of the robot frame
-//            // respectively from [-1, 1].
-//
-//            if (!FIELD_CENTRIC) {
-//
-//                // For a robot centric model, the input of (0,1,0) for (leftX, leftY, rightX)
-//                // will move the robot in the direction of its current heading. Every movement
-//                // is relative to the frame of the robot itself.
-//                //
-//                //                 (0,1,0)
-//                //                   /
-//                //                  /
-//                //           ______/_____
-//                //          /           /
-//                //         /           /
-//                //        /___________/
-//                //           ____________
-//                //          /  (0,0,1)  /
-//                //         /     ↻     /
-//                //        /___________/
-//
-//                // optional fourth parameter for squared inputs
-//                drive.driveRobotCentric(
-//                        -driverOp.getLeftX(),
-//                        driverOp.getLeftY(),
-//                        driverOp.getRightX(),
-//                        false
-//                );
-//            } else {
-//
-//                // Below is a model for how field centric will drive when given the inputs
-//                // for (leftX, leftY, rightX). As you can see, for (0,1,0), it will travel forward
-//                // regardless of the heading. For (1,0,0) it will strafe right (ref to the 0 heading)
-//                // regardless of the heading.
-//                //
-//                //                   heading
-//                //                     /
-//                //            (0,1,0) /
-//                //               |   /
-//                //               |  /
-//                //            ___|_/_____
-//                //          /           /
-//                //         /           / ---------- (1,0,0)
-//                //        /__________ /
-//
-//                // optional fifth parameter for squared inputs
-//                drive.driveFieldCentric(
-//                        driverOp.getLeftX(),
-//                        driverOp.getLeftY(),
-//                        driverOp.getRightX(),
-//                        imu.getRotation2d().getDegrees(),   // gyro value passed in here must be in degrees
-//                        falseServo
-//                );
-//            }
-//
-//        }
-//    }
-
-
 }

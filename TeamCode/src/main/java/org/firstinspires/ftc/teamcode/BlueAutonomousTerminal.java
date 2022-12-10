@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Camera;
+
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
@@ -44,6 +48,7 @@ public class BlueAutonomousTerminal extends CommandOpMode {
     private Button r_wristButton;
     private RotateWrist r_wristCommand;
 
+    private CameraSubsystem camera;
     private ElapsedTime timer;
 
     private RevIMU imu;
@@ -76,9 +81,33 @@ public class BlueAutonomousTerminal extends CommandOpMode {
         register(gripper, drive, lift, wrist);
 
         timer = new ElapsedTime();
-        DriveTest driving = new DriveTest(drive, gripper, imu);
+        camera = new CameraSubsystem(hardwareMap, "Webcam 1");
+        camera.initializeCamera();
 
+
+        SequentialCommandGroup driving = new SequentialCommandGroup();
+        ParallelRaceGroup cameraLookup = new ParallelRaceGroup();
+        cameraLookup.addCommands(
+                new TimerCommand(5000),
+                new SignalDetection(camera)
+        );
+        driving.addRequirements(drive, gripper, wrist);
+        driving.addCommands(
+                cameraLookup,
+                new GripperGrab(gripper),
+                new DriveSeconds(drive,0, "stop", imu, false),
+                new DriveSeconds(drive, 400, "right", imu, false),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new AutonomousForward(drive, camera, imu, false),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new AutonomousReverse(drive, camera, imu, false),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new DriveFromCamera(drive, camera, imu, false),
+                new DriveSeconds(drive, 0, "stop", imu, false)
+        );
         schedule(driving);
+        //DriveTest driving = new DriveTest(drive, gripper, imu);
+        //schedule(park);
 
     }
 
@@ -86,6 +115,7 @@ public class BlueAutonomousTerminal extends CommandOpMode {
     public void run() {
         telemetry.clearAll();
         telemetry.addData("ElapsedTime: ", timer.seconds());
+        telemetry.addData("Target", camera::getColor);
         telemetry.update();
         super.run();
     }
