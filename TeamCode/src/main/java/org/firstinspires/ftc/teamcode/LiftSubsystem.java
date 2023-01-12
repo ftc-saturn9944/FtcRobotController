@@ -49,6 +49,14 @@ public class LiftSubsystem extends SubsystemBase {
         }
     }
 
+    public void setPosition(int position) {
+        liftMotor.setTargetPosition(position);
+    }
+
+    public void setPower(double power) {
+        liftMotor.set(power);
+    }
+
     public void raiseLift() {
         liftMotor.set(MOTOR_POWER);
     }
@@ -65,6 +73,7 @@ public class LiftSubsystem extends SubsystemBase {
     public Double getTargetDist() {
         return scoring.getCurrent().getTarget();
     }
+    public int getEncoderValue() {return liftMotor.getCurrentPosition();}
 
     public boolean targetReached() {
         return scoring.getCurrent().atTarget(liftSensor.getDistance(DistanceUnit.CM));

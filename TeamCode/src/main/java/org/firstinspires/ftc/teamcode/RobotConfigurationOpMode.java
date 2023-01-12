@@ -129,6 +129,7 @@ public class RobotConfigurationOpMode extends CommandOpMode {
         telemetry.addData("Driver Field Centric?", drive::getDriveMethod);
         telemetry.addData("RGB", camera::getRGBDataString);
         telemetry.addData("Target", camera::getColor);
+        telemetry.addData("Encoder",lift::getEncoderValue);
         telemetry.update();
         super.run();
     }
