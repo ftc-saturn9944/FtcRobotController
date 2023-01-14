@@ -17,14 +17,16 @@ public class DriveFromCamera extends CommandBase {
     private RevIMU m_imu;
     private Boolean m_field;
     private CameraSubsystem m_camera;
+    private String m_parkDirection;
 
     private double POWER = 0.5;
 
-    public DriveFromCamera(MecanumSubsystem subsystem, CameraSubsystem camera, RevIMU imu, Boolean field) {
+    public DriveFromCamera(MecanumSubsystem subsystem, CameraSubsystem camera, RevIMU imu, Boolean field, String parkDirection) {
         m_drive = subsystem;
         m_field = field;
         m_imu = imu;
         m_camera = camera;
+        m_parkDirection = parkDirection;
         addRequirements(m_drive);
     }
 
@@ -36,6 +38,9 @@ public class DriveFromCamera extends CommandBase {
     @Override
     public void execute() {
         m_direction = m_camera.getTargetPosition();
+        if (m_camera.getColor() == "park") {
+            m_direction = m_parkDirection;
+        }
         switch (m_direction) {
             case "left":
                 m_strafe = -POWER;

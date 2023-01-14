@@ -1,30 +1,33 @@
 package org.firstinspires.ftc.teamcode;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-import static org.firstinspires.ftc.robotcore.internal.camera.WebcamExample.TAG;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSession;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager;
+
+
 import android.graphics.ImageFormat;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.android.util.Size;
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureRequest;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSequenceId;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSession;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCharacteristics;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraException;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraFrame;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraManager;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.collections.EvictingBlockingQueue;
 import org.firstinspires.ftc.robotcore.internal.network.CallbackLooper;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
@@ -38,11 +41,25 @@ import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
+/**
+ * This OpMode illustrates how to open a webcam and retrieve images from it. It requires a configuration
+ * containing a webcam with the default name ("Webcam 1"). When the opmode runs, pressing the 'A' button
+ * will cause a frame from the camera to be written to a file on the device, which can then be retrieved
+ * by various means (e.g.: Device File Explorer in Android Studio; plugging the device into a PC and
+ * using Media Transfer; ADB; etc)
+ */
+@TeleOp(name="Concept: Webcam", group ="Concept")
+//@Disabled
+public class ConceptWebcam extends LinearOpMode {
 
+    //----------------------------------------------------------------------------------------------
+    // State
+    //----------------------------------------------------------------------------------------------
 
-public class CameraSubsystem extends SubsystemBase {
+    private static final String TAG = "Webcam Sample";
 
+    /** How long we are to wait to be granted permission to use the camera before giving up. Here,
+     * we wait indefinitely */
     private static final int secondsPermissionTimeout = Integer.MAX_VALUE;
 
     /** State regarding our interaction with the camera */
@@ -51,9 +68,6 @@ public class CameraSubsystem extends SubsystemBase {
     private Camera camera;
     private CameraCaptureSession cameraCaptureSession;
 
-    private static String color = "park";
-
-    private Bitmap bmp;
     /** The queue into which all frames from the camera are placed as they become available.
      * Frames which are not processed by the OpMode are automatically discarded. */
     private EvictingBlockingQueue<Bitmap> frameQueue;
@@ -67,158 +81,66 @@ public class CameraSubsystem extends SubsystemBase {
      * if you're curious): no knowledge of multi-threading is needed here. */
     private Handler callbackHandler;
 
+    //----------------------------------------------------------------------------------------------
+    // Main OpMode entry
+    //----------------------------------------------------------------------------------------------
 
-    public CameraSubsystem (HardwareMap hMap, String webcam){
+    @Override public void runOpMode() {
 
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
         cameraManager = ClassFactory.getInstance().getCameraManager();
-        cameraName = hMap.get(WebcamName.class, webcam);
-
+        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
         initializeFrameQueue(2);
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
-    }
-    public boolean isFinished(){
-        return true;
-    }
+        try {
+            openCamera();
+            if (camera == null) return;
 
-    public void initializeCamera() {
-        openCamera();
-        startCamera();
-    }
-    public Bitmap capture(){
+            startCamera();
+            if (cameraCaptureSession == null) return;
 
-        openCamera();
-        startCamera();
-        Bitmap bmp = frameQueue.poll();
+            telemetry.addData(">", "Press Play to start");
+            telemetry.update();
+            waitForStart();
+            telemetry.clear();
+            telemetry.addData(">", "Started...Press 'A' to capture frame");
 
-        closeCamera();
+            boolean buttonPressSeen = false;
+            boolean captureWhenAvailable = false;
+            while (opModeIsActive()) {
 
-        return bmp;
-    }
+                boolean buttonIsPressed = gamepad1.a;
+                if (buttonIsPressed && !buttonPressSeen) {
+                    captureWhenAvailable = true;
+                }
+                buttonPressSeen = buttonIsPressed;
 
-    public int[] getRGBData(){
-        startCamera();
-        bmp = frameQueue.poll();
-        if (bmp != null) {
-            int y = 250;
-            for (int x = 325; x < 360; x += 2) {
-                int pixel = bmp.getPixel(x, y);
+                if (captureWhenAvailable) {
+                    Bitmap bmp = frameQueue.poll();
+                    if (bmp != null) {
+                        captureWhenAvailable = false;
+                        onNewFrame(bmp);
+                    }
+                }
 
-                int r = Color.red(pixel);
-                int g = Color.green(pixel);
-                int b = Color.blue(pixel);
-                return new int[]{r, g, b};
+                telemetry.update();
             }
-            onNewFrame(bmp);
-        }
-        return new int[]{-1, -1, -1};
-    }
-
-    public String getRGBDataString() {
-        int[] rgb = this.getRGBData();
-        this.detectColor();
-        return rgb[0] + ", " + rgb[1] + ", " + rgb[2];
-    }
-
-    public void detectColor (){
-        int[] rgb = this.getRGBData();
-        int r = rgb[0];
-        int g = rgb[1];
-        int b = rgb[2];
-
-        if ((r > 75 && r < 125) && (g > 115 && g < 165) && (b > 75 && b < 115)) {
-            this.color = "Green";
-        } else if ((r > 175 && r < 255) && (g > 185 && g < 255) && (b > 0 && b < 110)) {
-            this.color = "Yellow";
-        } else if ((r > 95 && r < 145) && (g > 60 && g < 105) && (b > 100 && b < 155)) {
-            this.color = "Purple";
-        }
-        //color = "Green";
-    }
-
-    public String getColor() {
-        return this.color;
-    }
-
-    public String getTargetPosition() {
-        switch (this.color) {
-            case "Green":
-                return "right";
-            case "Yellow":
-                return "left";
-            case "Purple":
-                return "stop";
-            default:
-                return "left";
+        } finally {
+            closeCamera();
         }
     }
 
-    public long getTargetTime() {
-        switch (this.color) {
-            case "Green":
-               return 2000;
-            case "Yellow":
-                return 2000;
-            case "Purple":
-                return 0;
-            default:
-                return 2700;
-        }
-    }
-
-    public long getForwardTime() {
-        if (this.color == "park") {
-            return 200;
-        } else {
-            return 1100;
-        }
-    }
-
-    public long getReverseTime() {
-        if (this.color == "park") {
-            return 0;
-        } else {
-            return 150;
-        }
-    }
+    /** Do something with the frame */
     private void onNewFrame(Bitmap frame) {
-        //saveBitmap(frame);
+        saveBitmap(frame);
         frame.recycle(); // not strictly necessary, but helpful
     }
-    public int getParking(Bitmap bmp){
 
-        int level = 3;
-
-        if (bmp != null) {
-
-                        /*if(80 < r && r < 95 && 110 < g && g < 130 && 60 < b && b <80 && y < 240){
-                            telemetry.addData("TSE:", x + " " + y);
-                            telemetry.update();
-                            if( x < 215){
-                                level = 1;
-                            } else if (x > 300 && x < 505){
-                                level = 2;
-                            }
-                        }*/
-
-
-            //telemetry.addData("RGB", r + ", " + g + ", " + b);
-            //telemetry.update();
-
-            //sleep(10000);
-            //telemetry.addData(">", "Not found");
-            //telemetry.update();
-
-            //onNewFrame(bmp);
-        }
-
-
-        return level;
-
-
-    }
+    //----------------------------------------------------------------------------------------------
+    // Camera operations
+    //----------------------------------------------------------------------------------------------
 
     private void initializeFrameQueue(int capacity) {
         /** The frame queue will automatically throw away bitmap frames if they are not processed
@@ -332,12 +254,12 @@ public class CameraSubsystem extends SubsystemBase {
     //----------------------------------------------------------------------------------------------
 
     private void error(String msg) {
-//            telemetry.log().add(msg);
-//            telemetry.update();
+        telemetry.log().add(msg);
+        telemetry.update();
     }
     private void error(String format, Object...args) {
-//            telemetry.log().add(format, args);
-//            telemetry.update();
+        telemetry.log().add(format, args);
+        telemetry.update();
     }
 
     private boolean contains(int[] array, int value) {

@@ -1,16 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Camera;
-
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.SensorRevTOFDistance;
 import com.arcrobotics.ftclib.hardware.ServoEx;
@@ -18,13 +12,10 @@ import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class BlueAutonomousTerminal extends CommandOpMode {
+public class RedAutonomous extends CommandOpMode {
 
     static boolean FIELD_CENTRIC = true;
 
@@ -102,7 +93,7 @@ public class BlueAutonomousTerminal extends CommandOpMode {
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new AutonomousReverse(drive, camera, imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
-                new DriveFromCamera(drive, camera, imu, false),
+                new DriveFromCamera(drive, camera, imu, false, "left"),
                 new DriveSeconds(drive, 0, "stop", imu, false)
         );
         schedule(driving);
