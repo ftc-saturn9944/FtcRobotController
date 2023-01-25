@@ -30,7 +30,7 @@ public class RobotTeleOpField extends CommandOpMode {
 
     private GamepadEx driverOp, toolOp;
     private GripperSubsystem gripper;
-    private Button m_grabButton, m_releaseButton;
+    private Button m_grabButton, m_releaseButton, m_resetIMUButton;
     private GripperGrab m_grabCommand;
     private GripperRelease m_releaseCommand;
 
@@ -93,6 +93,10 @@ public class RobotTeleOpField extends CommandOpMode {
         r_wristButton = (new GamepadButton(toolOp, GamepadKeys.Button.X))
                 .whenPressed(r_wristCommand);
 
+        m_resetIMUButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
+                .whenPressed(
+                        new InstantCommand(() -> imu.reset())
+                );
         m_driveCommand = new DefaultDrive(
                 drive,
                 () -> driverOp.getLeftX(),
