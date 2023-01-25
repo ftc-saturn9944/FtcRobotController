@@ -15,8 +15,8 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous
-public class BlueAutonomousTerminal2 extends CommandOpMode {
+@Autonomous(name="Autonomous Left Start")
+public class BlueAutonomousTerminalLeft extends CommandOpMode {
 
     static boolean FIELD_CENTRIC = true;
 
@@ -82,15 +82,15 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
         ParallelRaceGroup cameraLookup = new ParallelRaceGroup();
         SequentialCommandGroup parking = new SequentialCommandGroup();
         parking.addCommands(
-                new DriveSeconds(drive, 1300, "right", imu, false),
+                new DriveSeconds(drive, 1300, "left", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new GripperRelease(gripper),
                 new TimerCommand(3000),
-                new DriveSeconds(drive, 1800, "right", imu, false),
+                new DriveSeconds(drive, 1800, "left", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new GripperGrab(gripper),
                 new TimerCommand(3000),
-                new DriveSeconds(drive, 1800, "right", imu, false),
+                new DriveSeconds(drive, 1800, "left", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false)
         );
         ParallelCommandGroup parkParallel = new ParallelCommandGroup();
@@ -109,7 +109,9 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
                 new RotateWrist(wrist),
                 new LiftByEncoder(lift, 200),
                 new DriveSeconds(drive,0, "stop", imu, false),
-                new DriveSeconds(drive, 3050, "left", imu, false),
+                // Align to the Junction by strafe
+                new DriveSeconds(drive, 3350, "right", imu, false),
+                // End Align to the Junction by strafe
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new DriveSeconds(drive, 1400, "up", imu, false, 0.3),
                 new DriveSeconds(drive, 0, "stop", imu, false),
@@ -130,7 +132,7 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
                 new LiftByEncoder(lift, 100),
                 parkParallel
 
-                );
+        );
         schedule(driving);
 
         s_liftCommand = new StopLift(lift);
