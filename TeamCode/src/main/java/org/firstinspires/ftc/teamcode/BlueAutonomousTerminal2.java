@@ -43,6 +43,7 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
     private RaiseLift r_liftCommand;
     private LowerLift l_liftCommand;
     private StopLift s_liftCommand;
+    private DriveSeconds s_driveCommand;
 
     private WristSubsystem wrist;
     private Button r_wristButton;
@@ -95,23 +96,27 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
         driving.addCommands(
                 //cameraLookup,
                 new GripperGrab(gripper),
-//                new DriveSeconds(drive,0, "stop", imu, false),
-//                new DriveSeconds(drive, 2500, "left", imu, false),
-//                new DriveSeconds(drive, 0, "stop", imu, false),
-//                new DriveSeconds(drive, 1400, "up", imu, false, 0.3),
-//                new DriveSeconds(drive, 0, "stop", imu, false),
-                new LiftByEncoder(lift, 6000),
+                new LiftByEncoder(lift, 200),
+                new DriveSeconds(drive,0, "stop", imu, false),
+                new DriveSeconds(drive, 2500, "left", imu, false),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new DriveSeconds(drive, 1400, "up", imu, false, 0.3),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new LiftByEncoder(lift, 15000),
                 new GripperRelease(gripper),
-                new LiftByEncoder(lift, 4500),
+                new TimerCommand(500),
                 //new StopLift(lift),
-                new DriveSeconds(drive, 0, "stop", imu, false)
+                new DriveSeconds(drive, 200, "down", imu, false),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new LiftByEncoder(lift, 100)
         );
         schedule(driving);
 
         s_liftCommand = new StopLift(lift);
         lift.setDefaultCommand(s_liftCommand);
-        //DriveTest driving = new DriveTest(drive, gripper, imu);
-        //schedule(park);
+        s_driveCommand = new DriveSeconds(drive, 0, "stop", imu, false);
+        //drive.setDefaultCommand(s_driveCommand);
+
 
     }
 
