@@ -24,9 +24,9 @@ dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }
 
-git {
-    implementation 'https://github.com/ftc-saturn9944/FTCLib.git', {
-        commit 'origin/master'
-        projectPath '/core'
-    }
-}
+// git {
+//     implementation 'https://github.com/ftc-saturn9944/FTCLib.git', {
+//         commit 'origin/master'
+//         projectPath '/core'
+//     }
+// }
