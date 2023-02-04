@@ -110,7 +110,7 @@ public class BlueAutonomousTerminalLeft extends CommandOpMode {
                 new LiftByEncoder(lift, 200),
                 new DriveSeconds(drive,0, "stop", imu, false),
                 // Align to the Junction by strafe
-                new DriveSeconds(drive, 3350, "right", imu, false),
+                new DriveSeconds(drive, 3150, "right", imu, false),
                 // End Align to the Junction by strafe
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new DriveSeconds(drive, 1400, "up", imu, false, 0.3),
@@ -138,7 +138,7 @@ public class BlueAutonomousTerminalLeft extends CommandOpMode {
         s_liftCommand = new StopLift(lift);
         lift.setDefaultCommand(s_liftCommand);
         s_driveCommand = new DriveSeconds(drive, 0, "stop", imu, false);
-        //drive.setDefaultCommand(s_driveCommand);
+        drive.setDefaultCommand(s_driveCommand);
 
 
     }

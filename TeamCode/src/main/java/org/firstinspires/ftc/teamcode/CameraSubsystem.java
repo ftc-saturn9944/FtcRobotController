@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.robotcore.internal.camera.WebcamExample.TAG;
 
@@ -9,6 +10,7 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -38,8 +40,6 @@ import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
-
 
 public class CameraSubsystem extends SubsystemBase {
 
@@ -51,7 +51,7 @@ public class CameraSubsystem extends SubsystemBase {
     private Camera camera;
     private CameraCaptureSession cameraCaptureSession;
 
-    private static String color = "park";
+    private static String color = "Purple";
 
     private Bitmap bmp;
     /** The queue into which all frames from the camera are placed as they become available.
@@ -102,8 +102,8 @@ public class CameraSubsystem extends SubsystemBase {
         startCamera();
         bmp = frameQueue.poll();
         if (bmp != null) {
-            int y = 250;
-            for (int x = 325; x < 360; x += 2) {
+            int y = 285;
+            for (int x = 390; x < 440; x += 2) {//325-360
                 int pixel = bmp.getPixel(x, y);
 
                 int r = Color.red(pixel);
@@ -128,14 +128,23 @@ public class CameraSubsystem extends SubsystemBase {
         int g = rgb[1];
         int b = rgb[2];
 
-        if ((r > 75 && r < 125) && (g > 115 && g < 165) && (b > 75 && b < 115)) {
+        if ((r > 60 && r < 125) && (g > 115 && g < 165) && (b > 45 && b < 115)) {
             this.color = "Green";
-        } else if ((r > 175 && r < 255) && (g > 185 && g < 255) && (b > 0 && b < 110)) {
+        } else if ((r > 175 && r < 255) && (g > 180 && g < 255) && (b > 0 && b < 110)) {
             this.color = "Yellow";
-        } else if ((r > 95 && r < 145) && (g > 60 && g < 105) && (b > 100 && b < 155)) {
+        } else if ((r > 95 && r < 145) && (g > 50 && g < 105) && (b > 100 && b < 155)) {
             this.color = "Purple";
         }
         //color = "Green";
+        /*
+         //Alternate set-up
+         if ((r > 60 && r < 125) && (g > 115 && g < 145) && (b > 45 && b < 95)) {
+            this.color = "Green";
+        } else if ((r > 175 && r < 210) && (g > 180 && g < 210) && (b > 0 && b < 40)) {
+            this.color = "Yellow";
+        } else if ((r > 85 && r < 125) && (g > 45 && g < 100) && (b > 95 && b < 135)) {
+            this.color = "Purple";
+        }*/
     }
 
     public String getColor() {
@@ -147,24 +156,24 @@ public class CameraSubsystem extends SubsystemBase {
             case "Green":
                 return "right";
             case "Yellow":
-                return "left";
+                return "right";//left
             case "Purple":
-                return "stop";
+                return "right";
             default:
-                return "left";
+                return "right";
         }
     }
 
     public long getTargetTime() {
         switch (this.color) {
             case "Green":
-               return 2000;
+               return 5000;
             case "Yellow":
-                return 2000;
+                return 1300;//2000 for all
             case "Purple":
-                return 0;
+                return 3100;
             default:
-                return 2700;
+                return 1300;//2700
         }
     }
 

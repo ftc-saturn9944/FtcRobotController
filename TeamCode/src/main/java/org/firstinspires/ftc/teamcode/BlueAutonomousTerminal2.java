@@ -104,19 +104,19 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
         );
         driving.addRequirements(drive, gripper, wrist, lift);
         driving.addCommands(
-                //cameraLookup,
+                cameraLookup,
                 new GripperGrab(gripper),
                 new RotateWrist(wrist),
                 new LiftByEncoder(lift, 200),
                 new DriveSeconds(drive,0, "stop", imu, false),
-                new DriveSeconds(drive, 3050, "left", imu, false),
+                new DriveSeconds(drive, 2700, "left", imu, false),//2700 worked at ~12.95 volts, 29850 had best results
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new DriveSeconds(drive, 1400, "up", imu, false, 0.3),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new LiftByEncoder(lift, 15000),
 
                 new TimerCommand(1000),
-                new DriveSeconds(drive, 700, "up", imu, false, 0.3),
+                new DriveSeconds(drive, 600, "up", imu, false, 0.3),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new TimerCommand(500),
                 new LiftByEncoder(lift, 13000),
@@ -125,10 +125,16 @@ public class BlueAutonomousTerminal2 extends CommandOpMode {
                 new RotateWrist(wrist),
                 new GripperGrab(gripper),
                 new TimerCommand(500),
-                new DriveSeconds(drive, 100, "down", imu, false),
+                new DriveSeconds(drive, 150, "down", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new LiftByEncoder(lift, 100),
-                parkParallel
+                //new StopLift(lift),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new DriveFromCamera(drive, camera, imu, false, "right"),
+                new DriveSeconds(drive, 0, "stop", imu, false)
+                //new StopLift(lift)
+                //parkParallel
+
 
                 );
         schedule(driving);
