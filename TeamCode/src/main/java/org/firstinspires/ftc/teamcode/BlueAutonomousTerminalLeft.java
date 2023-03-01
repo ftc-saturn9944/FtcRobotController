@@ -1,21 +1,24 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelRaceGroup;
+import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.RevIMU;
-import com.arcrobotics.ftclib.hardware.SensorRevTOFDistance;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Autonomous Left Start")
+import java.util.HashMap;
+
+@Autonomous(name="Left Start - Score Center", group="Center High")
 public class BlueAutonomousTerminalLeft extends CommandOpMode {
 
     static boolean FIELD_CENTRIC = true;
@@ -45,11 +48,12 @@ public class BlueAutonomousTerminalLeft extends CommandOpMode {
     private ElapsedTime timer;
 
     private RevIMU imu;
+
+    private EncoderDriveSubsystem encoderDrive;
     public void initialize() {
 
         imu = new RevIMU(hardwareMap);
         imu.init();
-        SensorRevTOFDistance liftDistance = new SensorRevTOFDistance(hardwareMap, "LIFTDISTANCE");
         ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 90);
         ServoEx wristServo = new SimpleServo(hardwareMap, "WRIST", 0, 180);
         drive = new MecanumSubsystem(
@@ -60,16 +64,21 @@ public class BlueAutonomousTerminalLeft extends CommandOpMode {
                 imu,
                 false
         );
+        encoderDrive = new EncoderDriveSubsystem(
+                hardwareMap.get(DcMotor.class,"LEFTFRONT"),
+                hardwareMap.get(DcMotor.class, "LEFTREAR"),
+                hardwareMap.get(DcMotor.class, "RIGHTFRONT"),
+                hardwareMap.get(DcMotor.class, "RIGHTREAR" )
+        );
         gripper = new GripperSubsystem(gripServo);
 
-        lift = new LiftSubsystem(hardwareMap, "LIFTDISTANCE", "LIFTMOTOR");
+        lift = new LiftSubsystem(hardwareMap, "LIFTMOTOR");
 
         wrist = new WristSubsystem(wristServo);
 
         telemetry.addData("GripperPosition", gripper::getPosition);
-        telemetry.addData("LiftSensor", lift::getDistance);
+        //telemetry.addData("LiftSensor", lift::getDistance);
         telemetry.addData("LiftTargetName", lift::getTargetName);
-        telemetry.addData("LiftTargetDist", lift::getTargetDist);
         telemetry.update();
         register(gripper, drive, lift, wrist);
 
@@ -77,48 +86,92 @@ public class BlueAutonomousTerminalLeft extends CommandOpMode {
         camera = new CameraSubsystem(hardwareMap, "Webcam 1");
         camera.initializeCamera();
 
+        /* Parking Spots */
+        int park3 = 625;
+        int park2 = 625+1250;
+        int park1 = 625+1250+1250;
 
+        HashMap<Object, Command> parkDrive = new HashMap<Object, Command>() {{
+            put("Yellow", new DriveByEncoder(encoderDrive, park1, "Left", 0.8));
+            put("Purple", new DriveByEncoder(encoderDrive, park2, "Left", 0.8));
+            put("Green", new DriveByEncoder(encoderDrive, park3, "Left", 0.8));
+            put("Park", new SequentialCommandGroup(
+                    new DriveByEncoder(encoderDrive, 1200, "Down", 0.8),
+                    new DriveByEncoder(encoderDrive, park3, "Left", 0.8)
+            ));
+        }};
+        SelectCommand parkLocation = new SelectCommand(
+                parkDrive,
+                // Selector
+                camera::getColor
+        );
         SequentialCommandGroup driving = new SequentialCommandGroup();
         ParallelRaceGroup cameraLookup = new ParallelRaceGroup();
-        SequentialCommandGroup parking = new SequentialCommandGroup();
-        parking.addCommands(
-                new DriveSeconds(drive, 1300, "left", imu, false),
-                new DriveSeconds(drive, 0, "stop", imu, false),
-                new GripperRelease(gripper),
-                new TimerCommand(3000),
-                new DriveSeconds(drive, 1800, "left", imu, false),
-                new DriveSeconds(drive, 0, "stop", imu, false),
-                new GripperGrab(gripper),
-                new TimerCommand(3000),
-                new DriveSeconds(drive, 1800, "left", imu, false),
-                new DriveSeconds(drive, 0, "stop", imu, false)
-        );
-        ParallelCommandGroup parkParallel = new ParallelCommandGroup();
-        parkParallel.addCommands(
-                new StopLift(lift),
-                parking
-        );
         cameraLookup.addCommands(
                 new TimerCommand(5000),
                 new SignalDetection(camera)
         );
-        driving.addRequirements(drive, gripper, wrist, lift);
+        driving.addRequirements(encoderDrive, gripper, wrist, lift);
         driving.addCommands(
-                //cameraLookup,
+                new GripperGrab(gripper),
+                new RotateWrist(wrist),
+                cameraLookup,
+                new LiftByEncoder(lift, -200),
+                new StopLiftAutonomous(lift),
+
+                /* Drive from Left */
+                //new DriveByEncoder(encoderDrive, 1680, "Left", 0.8),
+                /* Drive from Right */
+                new DriveByEncoder(encoderDrive, 2030, "Right", 0.8),//2050
+                /* Line up to the high Junction */
+
+                new DriveByEncoder(encoderDrive, 20, "Down", 0.2),
+                new DriveByEncoder(encoderDrive, 700, "Up", 0.3),
+                new TimerCommand(300),
+                new DriveByEncoder(encoderDrive, 500, "Up", 0.3),
+
+                //new TimerCommand(3000),
+
+
+                /* Scoring */
+                new LiftByEncoder(lift, -6850),
+                new StopLiftAutonomous(lift),
+                new DriveByEncoder(encoderDrive, 200, "Up", 0.2),
+                new TimerCommand(100),
+                new LiftByEncoder(lift, -6150),
+                new StopLiftAutonomous(lift),
+                new TimerCommand(500),
+                new GripperRelease(gripper),
+                new TimerCommand(500),
+                new LiftByEncoder(lift, -6850),
+                new StopLiftAutonomous(lift),
+                new DriveByEncoder(encoderDrive, 200, "Down", 0.2),
+                new GripperGrab(gripper),
+                new RotateWrist(wrist),
+                new LiftByEncoder(lift, -1500),
+                new StopLiftAutonomous(lift),
+                parkLocation,
+                new StopLiftAutonomous(lift)
+                //new DriveByEncoder(encoderDrive, 625, "Left", 0.5),
+                //new TimerCommand(3000),
+                //new DriveByEncoder(encoderDrive, 1250, "Left", 0.5),
+                //new TimerCommand(3000),
+                //new DriveByEncoder(encoderDrive, 1250, "Left", 0.5),
+
+
+        /*cameraLookup,
                 new GripperGrab(gripper),
                 new RotateWrist(wrist),
                 new LiftByEncoder(lift, 200),
                 new DriveSeconds(drive,0, "stop", imu, false),
-                // Align to the Junction by strafe
-                new DriveSeconds(drive, 3150, "right", imu, false),
-                // End Align to the Junction by strafe
+                new DriveSeconds(drive, 2700, "left", imu, false),//2700 worked at ~12.95 volts, 29850 had best results
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new DriveSeconds(drive, 1400, "up", imu, false, 0.3),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new LiftByEncoder(lift, 15000),
 
                 new TimerCommand(1000),
-                new DriveSeconds(drive, 700, "up", imu, false, 0.3),
+                new DriveSeconds(drive, 600, "up", imu, false, 0.3),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new TimerCommand(500),
                 new LiftByEncoder(lift, 13000),
@@ -127,18 +180,23 @@ public class BlueAutonomousTerminalLeft extends CommandOpMode {
                 new RotateWrist(wrist),
                 new GripperGrab(gripper),
                 new TimerCommand(500),
-                new DriveSeconds(drive, 100, "down", imu, false),
+                new DriveSeconds(drive, 150, "down", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new LiftByEncoder(lift, 100),
-                parkParallel
+                //new StopLift(lift),
+                new DriveSeconds(drive, 0, "stop", imu, false),
+                new DriveFromCamera(drive, camera, imu, false, "right"),
+                new DriveSeconds(drive, 0, "stop", imu, false)
+                //new StopLift(lift)
+                //parkParallel
+                */
 
         );
         schedule(driving);
 
         s_liftCommand = new StopLift(lift);
-        lift.setDefaultCommand(s_liftCommand);
-        s_driveCommand = new DriveSeconds(drive, 0, "stop", imu, false);
-        drive.setDefaultCommand(s_driveCommand);
+        //lift.setDefaultCommand(s_liftCommand);
+        //drive.setDefaultCommand(s_driveCommand);
 
 
     }

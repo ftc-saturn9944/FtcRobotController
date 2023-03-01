@@ -4,21 +4,14 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.RevIMU;
-import com.arcrobotics.ftclib.hardware.SensorRevTOFDistance;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
 public class RobotTeleOpField extends CommandOpMode {
@@ -55,15 +48,15 @@ public class RobotTeleOpField extends CommandOpMode {
 
         imu = new RevIMU(hardwareMap);
         imu.init();
-        SensorRevTOFDistance liftDistance = new SensorRevTOFDistance(hardwareMap, "LIFTDISTANCE");
+        //SensorRevTOFDistance liftDistance = new SensorRevTOFDistance(hardwareMap, "LIFTDISTANCE");
         ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 90);
         ServoEx wristServo = new SimpleServo(hardwareMap, "WRIST", 0, 180);
         drive = new MecanumSubsystem(
-
                 new MotorEx(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "RIGHTFRONT", Motor.GoBILDA.RPM_435),
+
                 imu,
                 false
         );
@@ -75,7 +68,7 @@ public class RobotTeleOpField extends CommandOpMode {
         m_releaseButton = (new GamepadButton(toolOp, GamepadKeys.Button.Y))
                 .whenPressed(m_releaseCommand);
 
-        lift = new LiftSubsystem(hardwareMap, "LIFTDISTANCE", "LIFTMOTOR");
+        lift = new LiftSubsystem(hardwareMap, "LIFTMOTOR");
         l_liftCommand = new LowerLift(lift);
         r_liftCommand = new RaiseLift(lift);
         s_liftCommand = new StopLift(lift);
@@ -107,7 +100,7 @@ public class RobotTeleOpField extends CommandOpMode {
         );
 
         telemetry.addData("GripperPosition", gripper::getPosition);
-        telemetry.addData("LiftSensor", lift::getDistance);
+        //telemetry.addData("LiftSensor", lift::getDistance);
         telemetry.addData("LiftTargetName", lift::getTargetName);
         telemetry.addData("LiftTargetDist", lift::getTargetDist);
         telemetry.update();
@@ -119,7 +112,7 @@ public class RobotTeleOpField extends CommandOpMode {
     public void run() {
         telemetry.clearAll();
         telemetry.addData("GripperPosition", gripper::getPosition);
-        telemetry.addData("LiftSensor", lift::getDistance);
+        //telemetry.addData("LiftSensor", lift::getDistance);
         telemetry.addData("LiftTargetName", lift::getTargetName);
         telemetry.addData("LiftTargetDist", lift::getTargetDist);
         telemetry.update();

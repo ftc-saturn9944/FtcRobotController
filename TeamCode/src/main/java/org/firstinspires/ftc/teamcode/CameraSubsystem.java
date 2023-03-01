@@ -36,6 +36,7 @@ import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -103,15 +104,21 @@ public class CameraSubsystem extends SubsystemBase {
         bmp = frameQueue.poll();
         if (bmp != null) {
             int y = 285;
-            for (int x = 390; x < 440; x += 2) {//325-360
-                int pixel = bmp.getPixel(x, y);
+            int x = 360;
+            ArrayList<Integer> pixels = new ArrayList<Integer>();
+            for (y = 270; y <= 280; y += 1) {
+                for (x = 353; x <= 363; x += 1) {//325-360
+                    int pixel = bmp.getPixel(x, y);
 
-                int r = Color.red(pixel);
-                int g = Color.green(pixel);
-                int b = Color.blue(pixel);
-                return new int[]{r, g, b};
+                    pixels.add(pixel);
+                }
             }
+            int avg = (int) pixels.stream().mapToDouble(a -> a).average().orElse(0);
+            int r = Color.red(avg);
+            int g = Color.green(avg);
+            int b = Color.blue(avg);
             onNewFrame(bmp);
+            return new int[]{r, g, b};
         }
         return new int[]{-1, -1, -1};
     }
@@ -128,14 +135,24 @@ public class CameraSubsystem extends SubsystemBase {
         int g = rgb[1];
         int b = rgb[2];
 
-        if ((r > 60 && r < 125) && (g > 115 && g < 165) && (b > 45 && b < 115)) {
+        /*
+        if ((r < 100) && (g > 120) && (b < 120 && b > 70)) {
             this.color = "Green";
-        } else if ((r > 175 && r < 255) && (g > 180 && g < 255) && (b > 0 && b < 110)) {
+        } else if ((r > 180) && (g > 180) && (b < 100)) {
             this.color = "Yellow";
-        } else if ((r > 95 && r < 145) && (g > 50 && g < 105) && (b > 100 && b < 155)) {
+        } else if ((r < 130 && r > 100) && (g < 100) && (b > 100)) {
             this.color = "Purple";
         }
-        //color = "Green";
+        */
+        if ((r > 90 && r < 130) && (g > 135 && g < 175) && (b > 65 && b < 130)) {
+            color = "Green";
+        } else if ((r > 175 && r < 255) && (g > 180 && g < 255) && (b > 0 && b < 110)) {
+            color = "Yellow";
+        } else if ((r > 95 && r < 155) && (g > 60 && g < 130) && (b > 110 && b < 175)) {
+            color = "Purple";
+        }
+
+        color = "Yellow";
         /*
          //Alternate set-up
          if ((r > 60 && r < 125) && (g > 115 && g < 145) && (b > 45 && b < 95)) {

@@ -59,7 +59,7 @@ public class CameraTest extends LinearOpMode {
     private File captureDirectory = AppUtil.ROBOT_DATA_DIR;
     private Handler callbackHandler;
     Orientation angles;
-    String color = "Yellow";
+    String color = "Purple";
 
     //robot setup
     public DcMotor leftFront = null;
@@ -136,8 +136,8 @@ public class CameraTest extends LinearOpMode {
             Bitmap bmp = frameQueue.poll();
             if (bmp != null) {
                 //onNewFrame(bmp);
-                int y = 285;
-                    for (int x = 355; x < 390; x+=2) {//390-440
+                for (int y = 280; y <= 290; y+=1) {
+                    for (int x = 363; x <= 373; x += 1) {//390-440
                         int pixel = bmp.getPixel(x, y);
 
                         int r = Color.red(pixel);
@@ -158,14 +158,14 @@ public class CameraTest extends LinearOpMode {
 
                          */
 
-                        if ((r > 60 && r < 125) && (g > 120 && g < 195) && (b > 45 && b < 165)) {
+                        if ((r > 60 && r < 120) && (g > 115 && g < 165) && (b > 45 && b < 145)) {
                             color = "Green";
                         } else if ((r > 175 && r < 255) && (g > 180 && g < 255) && (b > 0 && b < 110)) {
                             color = "Yellow";
-                        } else if ((r > 80 && r < 145) && (g > 45 && g < 115) && (b > 95 && b < 170)) {
+                        } else if ((r > 85 && r < 145) && (g > 45 && g < 108) && (b > 95 && b < 170)) {
                             color = "Purple";
                         }
-                        bmp.setPixel(x, y,89);
+                        bmp.setPixel(x, y, 89);
 
                         //telemetry.addData("RGB", r + ", " + g + ", " + b);
                         //telemetry.update();
@@ -174,7 +174,7 @@ public class CameraTest extends LinearOpMode {
                         //telemetry.addData(">", "Not found");
                         //telemetry.update();
                     }
-
+                }
                 onNewFrame(bmp);
             }
 
@@ -195,35 +195,35 @@ public class CameraTest extends LinearOpMode {
 
          */
 
-        drive("forward", 80);
-        drive("left", 1830);//1650
+        //drive("startforward", 60);
+        drive("left", 1820);//1650//1830
         sleep(200);
-        drive("back", 150);
-        drive("lift", 1000);
+        drive("back", 250);
+        drive("lift", -300);
         wrist.setPosition(0.05);
         sleep(100);
         drive("forward", 700);//1100 for lower speed
         sleep(200);
-        drive("lift", 12500);
+        drive("lift", -6450);
         //lift.setPower(0);
         sleep(200);
-        drive("forward", 460);//470//520 before forward at start
+        drive("forward", 550);//470//520//490 before forward at start
         sleep(200);
-        drive("lowerlift", 1200);
+        drive("lowerlift", 1600);
         gripper.setPosition(0.2);
         sleep(200);
-        drive("back", 140);
+        drive("back", 160);
         gripper.setPosition(0.8);
         sleep(200);
-        drive("lowerlift", 5000);
+        drive("lowerlift",4400);
         sleep(200);
 
         if(color.equals("Yellow")) {
-            drive("right", 700);
+            drive("right", 800);
         } else if(color.equals("Purple")) {
             drive("right", 2000);
         } else if(color.equals("Green")) {
-            drive("right", 3200);
+            drive("right", 3000);
         }
 
 
@@ -316,7 +316,29 @@ public class CameraTest extends LinearOpMode {
             while (opModeIsActive() & rightFront.isBusy() & leftFront.isBusy() & leftRear.isBusy() & rightRear.isBusy() & lift.isBusy()) {
                 idle();
             }
-        } else if (direction.equals("back")) {
+        } else if (direction.equals("startforward")) {
+            leftFront.setTargetPosition(encoderDist);
+            leftRear.setTargetPosition(encoderDist);
+            rightFront.setTargetPosition(encoderDist);
+            rightRear.setTargetPosition(encoderDist);
+            lift.setTargetPosition(encoderDist);
+
+            leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightRear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            leftFront.setPower(0.3);
+            leftRear.setPower(0.3);
+            rightFront.setPower(0.3);
+            rightRear.setPower(0.3);//0.3
+            lift.setPower(2.0);
+
+            while (opModeIsActive() & rightFront.isBusy() & leftFront.isBusy() & leftRear.isBusy() & rightRear.isBusy() & lift.isBusy()) {
+                idle();
+            }
+        }   else if (direction.equals("back")) {
             leftFront.setTargetPosition(-encoderDist);
             leftRear.setTargetPosition(-encoderDist);
             rightFront.setTargetPosition(-encoderDist);

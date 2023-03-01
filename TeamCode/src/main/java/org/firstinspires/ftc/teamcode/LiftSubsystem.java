@@ -1,29 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.hardware.SensorDistanceEx;
-import com.arcrobotics.ftclib.hardware.SensorRevTOFDistance;
-import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.qualcomm.hardware.motors.NeveRest3_7GearmotorV1;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class LiftSubsystem extends SubsystemBase {
 
-    private final SensorRevTOFDistance liftSensor;
+    //private final SensorRevTOFDistance liftSensor;
     private final MotorEx liftMotor;
 
     private DistanceList scoring;
 
     private Double MOTOR_POWER = 1.0;
-    public LiftSubsystem(HardwareMap hMap, String lift, String motor) {
-        liftSensor = new SensorRevTOFDistance(hMap, lift);
+    public LiftSubsystem(HardwareMap hMap, String motor) {
+        //liftSensor = new SensorRevTOFDistance(hMap, lift);
         liftMotor = new MotorEx(hMap, motor);
 
-        liftMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        liftMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         scoring = new DistanceList();
         scoring.addTarget("Junction", 13.0, 2.0,true);
         scoring.addTarget("Low", 25.0, 2.0);
@@ -38,7 +32,7 @@ public class LiftSubsystem extends SubsystemBase {
     public void lower() {
         scoring.previous();
     }
-
+/*
     public void moveLift() {
         if (this.targetReached()) {
             liftMotor.set(0);
@@ -48,7 +42,7 @@ public class LiftSubsystem extends SubsystemBase {
             liftMotor.set(-MOTOR_POWER);
         }
     }
-
+*/
     public void setPosition(int position) {
         liftMotor.setTargetPosition(position);
     }
@@ -58,14 +52,14 @@ public class LiftSubsystem extends SubsystemBase {
     }
 
     public void raiseLift() {
-        liftMotor.set(MOTOR_POWER);
-    }
-
-    public void lowerLift() {
         liftMotor.set(-MOTOR_POWER);
     }
 
-    public void stopLift() { liftMotor.set(0); }
+    public void lowerLift() {
+        liftMotor.set(MOTOR_POWER);
+    }
+
+    public void stopLift() { liftMotor.set(-0.1); }
     public String getTargetName() {
         return scoring.getCurrent().getName();
     }
@@ -75,10 +69,13 @@ public class LiftSubsystem extends SubsystemBase {
     }
     public int getEncoderValue() {return liftMotor.getCurrentPosition();}
 
+    /*
     public boolean targetReached() {
         return scoring.getCurrent().atTarget(liftSensor.getDistance(DistanceUnit.CM));
     }
     public double getDistance() {
         return liftSensor.getDistance(DistanceUnit.CM);
     }
+
+    */
 }

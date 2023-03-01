@@ -16,7 +16,7 @@ public class WristSubsystem extends SubsystemBase {
         gripper = wrist;
     }
     public void rotate() {
-        wristPosition = wristPosition == 0.05 ? 0.7 : 0.05;
+        wristPosition = wristPosition == 0.02 ? 0.7 : 0.02;//.7 is back
         gripper.setPosition(wristPosition);
     }
 }

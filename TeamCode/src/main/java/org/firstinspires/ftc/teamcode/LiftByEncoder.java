@@ -12,8 +12,8 @@ public class LiftByEncoder extends CommandBase {
     public LiftByEncoder(LiftSubsystem subsystem, int position) {
         m_lift = subsystem;
         m_position = position;
-        minPosition = m_position - 300;
-        maxPosition = m_position + 300;
+        minPosition = m_position - 10;
+        maxPosition = m_position + 10;
         addRequirements(m_lift);
     }
 
@@ -24,9 +24,9 @@ public class LiftByEncoder extends CommandBase {
     public void execute() {
         int currPos = m_lift.getEncoderValue();
         if (currPos < m_position) {
-            m_lift.raiseLift();
-        } else if (currPos > m_position) {
             m_lift.lowerLift();
+        } else if (currPos > m_position) {
+            m_lift.raiseLift();
         }
     }
 

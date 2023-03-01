@@ -138,7 +138,7 @@ public class ColorPark extends LinearOpMode {
             if (bmp != null) {
                 //onNewFrame(bmp);
                 int y = 285;
-                for (int x = 355; x < 390; x+=2) {//390-440
+                for (int x = 355; x < 375; x+=2) {//390-440
                     int pixel = bmp.getPixel(x, y);
 
                     int r = Color.red(pixel);
@@ -159,14 +159,14 @@ public class ColorPark extends LinearOpMode {
 
                          */
 
-                    if ((r > 60 && r < 125) && (g > 120 && g < 195) && (b > 45 && b < 165)) {
+                    if ((r > 60 && r < 120) && (g > 115 && g < 165) && (b > 45 && b < 145)) {
                         color = "Green";
-                    } else if ((r > 175 && r < 255) && (g > 180 && g < 255) && (b > 0 && b < 110)) {
+                    } else if ((r > 150 && r < 255) && (g > 150 && g < 255) && (b > 0 && b < 110)) {
                         color = "Yellow";
-                    } else if ((r > 80 && r < 145) && (g > 45 && g < 115) && (b > 95 && b < 170)) {
+                    } else if ((r > 85 && r < 145) && (g > 45 && g < 108) && (b > 95 && b < 170)) {
                         color = "Purple";
                     }
-                    bmp.setPixel(x, y,89);
+                    //bmp.setPixel(x, y,89);
 
                     //telemetry.addData("RGB", r + ", " + g + ", " + b);
                     //telemetry.update();
@@ -196,9 +196,9 @@ public class ColorPark extends LinearOpMode {
 
          */
         drive("right", 300);
-        drive("forward", 1400);
+        drive("forward", 1300);//1400
         sleep(2000);
-        drive("back", 300);
+        drive("back", 200);
         if(color.equals("Yellow")) {
             drive("left", 1100);
         } else if(color.equals("Purple")) {

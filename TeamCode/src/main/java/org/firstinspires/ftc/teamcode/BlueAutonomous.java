@@ -60,12 +60,12 @@ public class BlueAutonomous extends CommandOpMode {
         );
         gripper = new GripperSubsystem(gripServo);
 
-        lift = new LiftSubsystem(hardwareMap, "LIFTDISTANCE", "LIFTMOTOR");
+        lift = new LiftSubsystem(hardwareMap, "LIFTMOTOR");
 
         wrist = new WristSubsystem(wristServo);
 
         telemetry.addData("GripperPosition", gripper::getPosition);
-        telemetry.addData("LiftSensor", lift::getDistance);
+        //telemetry.addData("LiftSensor", lift::getDistance);
         telemetry.addData("LiftTargetName", lift::getTargetName);
         telemetry.addData("LiftTargetDist", lift::getTargetDist);
         telemetry.update();
