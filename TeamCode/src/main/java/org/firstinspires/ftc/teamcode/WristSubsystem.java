@@ -8,7 +8,7 @@ public class WristSubsystem extends SubsystemBase {
     private final ServoEx gripper;
 
     private Double scoring = 0.7;
-    private Double moving = 0.42;
+    private Double moving = 0.44;
     private Double wristPosition = moving;
     public WristSubsystem(final HardwareMap hMap, final String name) {
         gripper = hMap.get(ServoEx.class, name);

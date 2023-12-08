@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
@@ -24,6 +25,12 @@ public class RobotTeleOpField extends CommandOpMode {
     private GamepadEx driverOp, toolOp;
     private GripperSubsystem gripper;
     private Button m_grabButton, m_releaseButton, m_resetIMUButton;
+
+    private Button m_raiseHang, m_lowerHang;
+    private HangingSubsystem hang;
+    private RaiseHang rHangCommand;
+    private LowerHang lHangCommand;
+    private HangStop hangStop;
     private GripperGrab m_grabCommand;
     private GripperRelease m_releaseCommand;
 
@@ -54,10 +61,11 @@ public class RobotTeleOpField extends CommandOpMode {
         ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 180);
         ServoEx wristServo = new SimpleServo(hardwareMap, "WRIST", 0, 180);
         drive = new MecanumSubsystem(
-                new MotorEx(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435),
-                new MotorEx(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
+                new MotorEx(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
+
                 new MotorEx(hardwareMap, "RIGHTFRONT", Motor.GoBILDA.RPM_435),
+                new MotorEx(hardwareMap, "LEFTFRONT", Motor.GoBILDA.RPM_435),
                 imu,
                 false
         );
@@ -68,6 +76,18 @@ public class RobotTeleOpField extends CommandOpMode {
                 .whenPressed(m_grabCommand);
         m_releaseButton = (new GamepadButton(toolOp, GamepadKeys.Button.Y))
                 .whenPressed(m_releaseCommand);
+
+        m_raiseHang = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_UP);
+        m_lowerHang = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_DOWN);
+
+        hang = new HangingSubsystem(hardwareMap, "HANGMOTOR");
+        rHangCommand = new RaiseHang(hang);
+        lHangCommand = new LowerHang(hang);
+        hangStop = new HangStop(hang);
+        m_raiseHang.whenPressed(rHangCommand)
+                .whenReleased(hangStop);
+        m_lowerHang.whenPressed(lHangCommand)
+                .whenReleased(hangStop);
 
         lift = new LiftSubsystem(hardwareMap, "LIFTMOTOR");
         l_liftCommand = new LowerLift(lift);
@@ -96,7 +116,6 @@ public class RobotTeleOpField extends CommandOpMode {
                 .whenPressed(
                         new InstantCommand(() -> imu.reset())
                 );
-
         m_driveCommand = new DefaultDrive(
                 drive,
                 () -> driverOp.getLeftX(),
