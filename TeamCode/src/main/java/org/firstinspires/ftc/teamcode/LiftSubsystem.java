@@ -12,6 +12,7 @@ public class LiftSubsystem extends SubsystemBase {
 
     private DistanceList scoring;
 
+
     private Double MOTOR_POWER = 1.0;
     public LiftSubsystem(HardwareMap hMap, String motor) {
         //liftSensor = new SensorRevTOFDistance(hMap, lift);

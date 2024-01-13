@@ -84,4 +84,18 @@ public class MecanumSubsystem extends SubsystemBase {
         }
     }
 
+    // Rotation code
+    public double getHeading() {
+        return m_imu.getHeading();
+    }
+
+    public void rotateLeft() {
+        m_drive.driveRobotCentric(0,0,-0.2);
+
+    }
+
+    public void rotateRight() {
+        m_drive.driveRobotCentric(0,0, 0.2);
+    }
+
 }

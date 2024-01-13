@@ -10,15 +10,12 @@ public class GripperGrab extends CommandBase {
         addRequirements(gripper);
     }
 
-    public void initialize() {
+    @Override
+    public void execute() {
         gripper.grab();
     }
 
-    public void release() {
-        gripper.release();
-    }
-
-    public boolean isFinished() {
-        return true;
-    }
+    //public boolean isFinished() {
+    //    return true;
+    //}
 }

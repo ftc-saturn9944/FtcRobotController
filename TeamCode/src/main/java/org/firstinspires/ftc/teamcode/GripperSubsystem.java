@@ -2,29 +2,31 @@ package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.motors.CRServo;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class GripperSubsystem extends SubsystemBase {
 
-    private final ServoEx gripper;
+    private final CRServo gripper;
 
     public GripperSubsystem(final HardwareMap hMap, final String name) {
-        gripper = hMap.get(ServoEx.class, name);
+        gripper = hMap.get(CRServo.class, name);
     }
 
-    public GripperSubsystem(ServoEx gripper) {
+    public GripperSubsystem(CRServo gripper) {
+
         this.gripper = gripper;
+        //this.gripper.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
     }
 
     public void grab() {
-        gripper.setPosition(0.4);
+        gripper.set(1.0);
     }
 
     public void release() {
-        gripper.setPosition(0.1);
+        gripper.set(-1.0);
     }
 
-    public double getPosition () {
-        return gripper.getPosition();
-    }
+    public void stop() {gripper.stopMotor();}
 }

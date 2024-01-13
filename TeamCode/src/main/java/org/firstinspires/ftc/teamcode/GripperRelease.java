@@ -10,7 +10,8 @@ public class GripperRelease extends CommandBase {
         addRequirements(gripper);
     }
 
-    public void initialize() {
+    @Override
+    public void execute() {
         gripper.release();
     }
 

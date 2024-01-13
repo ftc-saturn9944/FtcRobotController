@@ -10,11 +10,12 @@ import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
+import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp
+@TeleOp(name="RobotTeleOpField", group="CenterStage")
 public class RobotTeleOpField extends CommandOpMode {
     // This variable determines whether the following program
     // uses field-centric or robot-centric driving styles. The
@@ -22,6 +23,8 @@ public class RobotTeleOpField extends CommandOpMode {
     // https://docs.ftclib.org/ftclib/features/drivebases#control-scheme
     static boolean FIELD_CENTRIC = true;
 
+    private DistanceSubsystem distance;
+    private FindTarget target;
     private GamepadEx driverOp, toolOp;
     private GripperSubsystem gripper;
     private Button m_grabButton, m_releaseButton, m_resetIMUButton;
@@ -33,6 +36,7 @@ public class RobotTeleOpField extends CommandOpMode {
     private HangStop hangStop;
     private GripperGrab m_grabCommand;
     private GripperRelease m_releaseCommand;
+    private GripperStop m_gripperStop;
 
     private MecanumSubsystem drive;
     private DefaultDrive m_driveCommand;
@@ -45,21 +49,38 @@ public class RobotTeleOpField extends CommandOpMode {
     private LowerLift l_liftCommand;
     private StopLift s_liftCommand;
 
-    private WristSubsystem wrist;
-    private Button r_wristButton;
-    private RotateWrist r_wristCommand;
+    private LauncherSubsystem launcher;
+    private LaunchDrone launch_command;
+    private Button l_button;
 
     private RevIMU imu;
 
     public void initialize() {
+        telemetry.setAutoClear(false);
+        telemetry.addLine("Starting Initialization");
+        telemetry.update();
+
+        telemetry.addLine(" ... Gamepads");
+        telemetry.update();
         driverOp = new GamepadEx(gamepad1);
         toolOp = new GamepadEx(gamepad2);
 
+        telemetry.addLine(" ... IMU");
+        telemetry.update();
         imu = new RevIMU(hardwareMap);
         imu.init();
+        m_resetIMUButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
+                .whenPressed(
+                        new InstantCommand(() -> imu.reset())
+                );
 
-        ServoEx gripServo = new SimpleServo(hardwareMap, "GRIPPER", 0, 180);
-        ServoEx wristServo = new SimpleServo(hardwareMap, "WRIST", 0, 180);
+        m_resetIMUButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
+                .whenPressed(
+                        new InstantCommand(() -> imu.reset())
+                );
+
+        telemetry.addLine(" ... Mecanum Wheels");
+        telemetry.update();
         drive = new MecanumSubsystem(
                 new MotorEx(hardwareMap, "RIGHTREAR", Motor.GoBILDA.RPM_435),
                 new MotorEx(hardwareMap, "LEFTREAR", Motor.GoBILDA.RPM_435),
@@ -69,14 +90,35 @@ public class RobotTeleOpField extends CommandOpMode {
                 imu,
                 false
         );
+        m_driveCommand = new DefaultDrive(
+                drive,
+                () -> driverOp.getLeftX(),
+                () -> driverOp.getLeftY(),
+                () -> -driverOp.getRightX(),
+                imu,
+                FIELD_CENTRIC
+        );
+
+        register(drive);
+        drive.setDefaultCommand(m_driveCommand);
+
+
+        telemetry.addLine(" ... Intake");
+        telemetry.update();
+        CRServo gripServo = new CRServo(hardwareMap, "GRIPPER");
         gripper = new GripperSubsystem(gripServo);
         m_grabCommand = new GripperGrab(gripper);
         m_releaseCommand = new GripperRelease(gripper);
+        m_gripperStop = new GripperStop(gripper);
         m_grabButton = (new GamepadButton(toolOp, GamepadKeys.Button.B))
-                .whenPressed(m_grabCommand);
+                .whenPressed(m_grabCommand)
+                .whenReleased(m_gripperStop);
         m_releaseButton = (new GamepadButton(toolOp, GamepadKeys.Button.Y))
-                .whenPressed(m_releaseCommand);
+                .whenPressed(m_releaseCommand)
+                .whenReleased(m_gripperStop);
 
+        telemetry.addLine(" ... Hanging");
+        telemetry.update();
         m_raiseHang = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_UP);
         m_lowerHang = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_DOWN);
 
@@ -89,6 +131,8 @@ public class RobotTeleOpField extends CommandOpMode {
         m_lowerHang.whenPressed(lHangCommand)
                 .whenReleased(hangStop);
 
+        telemetry.addLine(" ... Lift");
+        telemetry.update();
         lift = new LiftSubsystem(hardwareMap, "LIFTMOTOR");
         l_liftCommand = new LowerLift(lift);
         r_liftCommand = new RaiseLift(lift);
@@ -99,41 +143,30 @@ public class RobotTeleOpField extends CommandOpMode {
         l_liftButton = (new GamepadButton(toolOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whileHeld(l_liftCommand)
                 .whenReleased(s_liftCommand);
-
         lift.setDefaultCommand(s_liftCommand);
 
-        wrist = new WristSubsystem(wristServo);
-        r_wristCommand = new RotateWrist(wrist);
-        r_wristButton = (new GamepadButton(toolOp, GamepadKeys.Button.X))
-                .whenPressed(r_wristCommand);
+        telemetry.addLine(" ... Launcher");
+        telemetry.update();
+        launcher = new LauncherSubsystem(hardwareMap, "DRONE");
+        launch_command = new LaunchDrone(launcher);
+        l_button = (new GamepadButton(toolOp, GamepadKeys.Button.RIGHT_STICK_BUTTON))
+                .whenPressed(launch_command);
 
-        m_resetIMUButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
-                .whenPressed(
-                        new InstantCommand(() -> imu.reset())
-                );
-
-        m_resetIMUButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
-                .whenPressed(
-                        new InstantCommand(() -> imu.reset())
-                );
-        m_driveCommand = new DefaultDrive(
-                drive,
-                () -> driverOp.getLeftX(),
-                () -> driverOp.getLeftY(),
-                () -> -driverOp.getRightX(),
-                imu,
-                FIELD_CENTRIC
-        );
-
-        register(drive);
-        drive.setDefaultCommand(m_driveCommand);
+        telemetry.addLine(" ... Distance Sensor");
+        telemetry.update();
+        distance = new DistanceSubsystem(hardwareMap, "DISTANCE");
+        target = new FindTarget(distance, DistanceSubsystem.Targets.Left, 50.0);
+        distance.setDefaultCommand(target);
+        telemetry.addLine("Initialization Complete");
+        telemetry.update();
     }
 
     @Override
     public void run() {
         telemetry.clearAll();
-        telemetry.addData("GripperPosition", gripper::getPosition);
-        telemetry.addData("WristPosition", wrist::getPosition);
+        telemetry.addData("DISTANCE", distance::getDistance);
+        telemetry.addData("Target", distance::getTarget);
+        telemetry.addData("Lift", lift::getEncoderValue);
         telemetry.update();
         super.run();
     }
