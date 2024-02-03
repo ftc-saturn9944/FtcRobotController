@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class LauncherSubsystem  extends SubsystemBase {
     private final ServoEx gripper;
 
-    private Double launchPosition = 0.5;
+    private Double launchPosition = 0.1;
 
     public LauncherSubsystem(final HardwareMap hMap, final String name)  {
         gripper = new SimpleServo(hMap, name, 0, 180);

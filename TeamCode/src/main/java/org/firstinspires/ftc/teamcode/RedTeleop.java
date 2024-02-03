@@ -7,23 +7,19 @@ import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.arcrobotics.ftclib.hardware.RevIMU;
-import com.arcrobotics.ftclib.hardware.ServoEx;
-import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.LED;
 
-@TeleOp(name="Blue - Teleop", group="CenterStage")
-public class RobotTeleOpField extends CommandOpMode {
+@TeleOp(name="Red - Teleop", group="CenterStage")
+public class RedTeleop extends CommandOpMode {
     // Tuning Section
-    private RevBlinkinLedDriver.BlinkinPattern allianceColor = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-    private RevBlinkinLedDriver.BlinkinPattern allianceLaunch = RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_BLUE;
+    private RevBlinkinLedDriver.BlinkinPattern allianceColor = RevBlinkinLedDriver.BlinkinPattern.RED;
+    private RevBlinkinLedDriver.BlinkinPattern allianceLaunch = RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED;
     private double scoringProximity = 3.75;
     private double nearProximity = 40.0;
 

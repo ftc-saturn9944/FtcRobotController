@@ -14,4 +14,5 @@ public class GripperStop extends CommandBase {
     public void initialize() {
         gripper.stop();
     }
+    public boolean isFinished() { return true; };
 }

@@ -14,12 +14,10 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
-import java.util.Timer;
 
-@Autonomous(name="Test Target Detection", group="Testing")
-public class DetectionTesting extends CommandOpMode {
+@Autonomous(name="Red Autonomous - Detection", group="A-Full Score")
+public class AutonomousRedScoring extends CommandOpMode {
 
     // Tuning Variables
     // "up" or "down".  Backwards so "up" means towards the wall/human player
@@ -119,6 +117,7 @@ public class DetectionTesting extends CommandOpMode {
                         )
                 ),
                 new TimerCommand(250),
+                // TODO: Post Detection adjustments
                 // Center in starting tile.  Right has to move over, left and center moved too far
                 new ConditionalCommand(
                         new DriveSeconds(drive, 250, "left", imu, false), // if true
@@ -131,15 +130,15 @@ public class DetectionTesting extends CommandOpMode {
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new SelectCommand(
                         new HashMap<Object, Command>() {{
-                                put(DistanceSubsystem.Targets.Left, new SequentialCommandGroup(
-                                        new RotateDrive(drive, -90.0),
+                                put(DistanceSubsystem.Targets.Right, new SequentialCommandGroup(
+                                        new RotateDrive(drive, 90.0),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
                                         // Back up to put intake at left spike mark
                                         new DriveSeconds(drive, 250, "up", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
-                                        new RotateDrive(drive, -150),
+                                        new RotateDrive(drive, 150),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
-                                        new RotateDrive(drive, -90),
+                                        new RotateDrive(drive, 90),
                                         new DriveSeconds(drive, 0, "stop", imu, false)
                                 ));
                                 put(DistanceSubsystem.Targets.Center, new SequentialCommandGroup(
@@ -149,9 +148,9 @@ public class DetectionTesting extends CommandOpMode {
                                         new DriveSeconds(drive, 200, "up", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false)
                                 ));
-                                put(DistanceSubsystem.Targets.Right, new SequentialCommandGroup(
+                                put(DistanceSubsystem.Targets.Left, new SequentialCommandGroup(
                                         // Face right spike, bump prop and return
-                                        new RotateDrive(drive, -90.0),
+                                        new RotateDrive(drive, 90.0),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
                                         new DriveSeconds(drive, 400, "down", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
@@ -170,7 +169,7 @@ public class DetectionTesting extends CommandOpMode {
                 // Center on square 1 closer to backdrop than spike marks
                 new SelectCommand(
                         new HashMap<Object, Command>() {{
-                            put(DistanceSubsystem.Targets.Left, new SequentialCommandGroup(
+                            put(DistanceSubsystem.Targets.Right, new SequentialCommandGroup(
                                     // Back up slightly to center
                                     new DriveSeconds(drive, 50, "up", imu, false),
                                     new DriveSeconds(drive, 0, "stop", imu, false)
@@ -179,12 +178,12 @@ public class DetectionTesting extends CommandOpMode {
                                     new DriveSeconds(drive, 100, "up", imu, false),
                                     new DriveSeconds(drive, 0, "stop", imu, false),
                                     // Turn to match all other alignments and then back up to center
-                                    new RotateDrive(drive, -90.0),
+                                    new RotateDrive(drive, 90.0),
                                     new DriveSeconds(drive, 0, "stop", imu, false),
                                     new DriveSeconds(drive, 300, "up", imu, false),
                                     new DriveSeconds(drive, 0, "stop", imu, false)
                             ));
-                            put(DistanceSubsystem.Targets.Right, new SequentialCommandGroup(
+                            put(DistanceSubsystem.Targets.Left, new SequentialCommandGroup(
                                     // Back up to center
                                     new DriveSeconds(drive, 220, "up", imu, false),
                                     new DriveSeconds(drive, 0, "stop", imu, false)
@@ -194,7 +193,7 @@ public class DetectionTesting extends CommandOpMode {
                 ),
                 // We are now centered 1 square closer towards the backdrop from the spike marks facing
                 // away from the backdrop
-                new RotateDrive(drive, 87),
+                new RotateDrive(drive, -87),  // TODO: CHECK HEADING
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new ParallelRaceGroup(
                         new DriveSeconds(drive, 15000, "down", imu, false, 0.3),

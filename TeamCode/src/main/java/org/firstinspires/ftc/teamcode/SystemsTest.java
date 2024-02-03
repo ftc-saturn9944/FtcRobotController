@@ -11,17 +11,24 @@ import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-@TeleOp
+@TeleOp(name="System Test", group="Debug")
 public class SystemsTest extends CommandOpMode {
 
     private GamepadEx driverOp, toolOp;
 
     private Button leftFront, leftRear, rightFront, rightRear;
     private MotorEx lfront, lrear, rfront, rrear;
+
+    private RevBlinkinLedDriver lights;
+    private LEDSubsystem ledControl;
     public void initialize() {
+
+        lights = hardwareMap.get(RevBlinkinLedDriver.class, "LIGHTS");
+        ledControl = new LEDSubsystem(lights);
         driverOp = new GamepadEx(gamepad1);
         toolOp = new GamepadEx(gamepad2);
 
@@ -58,6 +65,12 @@ public class SystemsTest extends CommandOpMode {
                 .whenReleased(new InstantCommand(() -> {
                     rrear.stopMotor();
                 }));
+
+        //ledControl.setDefaultCommand(new SetLEDPattern(ledControl, RevBlinkinLedDriver.BlinkinPattern.BLUE));
+        new GamepadButton(driverOp, GamepadKeys.Button.DPAD_UP).whileHeld(new SetLEDPattern(ledControl, RevBlinkinLedDriver.BlinkinPattern.CONFETTI));
+        new GamepadButton(driverOp, GamepadKeys.Button.DPAD_DOWN).whileHeld(new SetLEDPattern(ledControl, RevBlinkinLedDriver.BlinkinPattern.BLACK));
+        new GamepadButton(driverOp, GamepadKeys.Button.DPAD_LEFT).whileHeld(new SetLEDPattern(ledControl, RevBlinkinLedDriver.BlinkinPattern.RED));
+        new GamepadButton(driverOp, GamepadKeys.Button.DPAD_RIGHT).whileHeld(new SetLEDPattern(ledControl, RevBlinkinLedDriver.BlinkinPattern.GREEN));
 
     }
 }

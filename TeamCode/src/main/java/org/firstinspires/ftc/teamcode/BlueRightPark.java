@@ -16,6 +16,7 @@ import java.util.Timer;
 public class BlueRightPark extends CommandOpMode {
 
     // Customize for teammate
+
     private int delayMilli = 7500;
 
     // Driving
@@ -105,12 +106,13 @@ public class BlueRightPark extends CommandOpMode {
         driving = new SequentialCommandGroup();
         driving.addRequirements(gripper, lift, drive);
         driving.addCommands(
+                new DriveSeconds(drive, 0, "stop", imu, false),
                 new TimerCommand(delayMilli),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 new LiftByEncoder(lift, -10),
                 new StopLiftAutonomous(lift),
                 new DriveSeconds(drive, 170, "down", imu, false),
-                new RotateDrive(drive, 88.0),
+                new RotateDrive(drive, 84.0),
                 new DriveSeconds(drive, 3000, "down", imu, false),
                 new RotateDrive(drive, 0.0),
                 new DriveSeconds(drive, 0, "stop", imu, false),

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
+
 public class LaunchDrone extends CommandBase {
     private final LauncherSubsystem launcher;
 
@@ -12,5 +13,9 @@ public class LaunchDrone extends CommandBase {
 
     public void initialize() {
         launcher.launch();
+    }
+
+    public boolean isFinished() {
+        return true;
     }
 }
