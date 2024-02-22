@@ -10,7 +10,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Red - Left - Park", group="Red", preselectTeleOp = "RobotTeleOpField")
+@Autonomous(name="Red - Left - Park", group="Red")
 public class RedLeftPark extends CommandOpMode {
 
     // Customize for TeamMate auto

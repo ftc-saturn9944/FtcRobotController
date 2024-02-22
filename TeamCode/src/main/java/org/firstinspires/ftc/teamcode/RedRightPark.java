@@ -10,7 +10,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Red - Right (Goal) - Park", group="Red", preselectTeleOp = "RobotTeleOpField")
+@Autonomous(name="Red - Right (Goal) - Park", group="Red")
 public class RedRightPark extends CommandOpMode {
 
     // Driving

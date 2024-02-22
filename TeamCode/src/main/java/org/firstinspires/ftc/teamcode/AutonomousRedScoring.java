@@ -23,7 +23,7 @@ public class AutonomousRedScoring extends CommandOpMode {
     // "up" or "down".  Backwards so "up" means towards the wall/human player
     private String parkDir = "up";
     // How many milliseconds to move for park purposes
-    private long parkDuration = 500;
+    private long parkDuration = 900;
     // Delay before starting to account for alliance partner
     private long delay = 0;
 
@@ -97,21 +97,26 @@ public class AutonomousRedScoring extends CommandOpMode {
         driving = new SequentialCommandGroup();
         driving.addCommands(
                 new StopLiftAutonomous(lift),
+                new LiftByEncoder(lift, -10),
+                new StopLiftAutonomous(lift),
                 new TimerCommand(delay),
-                new DriveSeconds(drive, 100, "down", imu, false),
+                new DriveSeconds(drive, 500, "down", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
+                new TimerCommand(2000),
                 new ParallelDeadlineGroup(
                         new TargetDetected(distance),
                         new SequentialCommandGroup(
                                 new ParallelRaceGroup(
                                         new TimerCommand(250),
-                                        new FindTarget(distance, DistanceSubsystem.Targets.Right, 90)
+                                        new FindTarget(distance, DistanceSubsystem.Targets.Right, 35)
                                 ),
-                                new DriveSeconds(drive, 500, "left", imu, false),
+                                //new DriveSeconds(drive, 300, "down", imu, false),
+                                new DriveSeconds(drive, 0, "stop", imu, false),
+                                new DriveSeconds(drive, 600, "left", imu, false),
                                 new DriveSeconds(drive, 0, "stop", imu, false),
                                 new ParallelRaceGroup(
                                         new TimerCommand(250),
-                                        new FindTarget(distance, DistanceSubsystem.Targets.Center, 150)
+                                        new FindTarget(distance, DistanceSubsystem.Targets.Center, 35)
                                 ),
                                 new InstantCommand(() -> {distance.setTarget(DistanceSubsystem.Targets.Left);})
                         )
@@ -120,17 +125,20 @@ public class AutonomousRedScoring extends CommandOpMode {
                 // TODO: Post Detection adjustments
                 // Center in starting tile.  Right has to move over, left and center moved too far
                 new ConditionalCommand(
-                        new DriveSeconds(drive, 250, "left", imu, false), // if true
+                        new DriveSeconds(drive, 100, "left", imu, false), // if true
                         new DriveSeconds(drive, 350, "right", imu, false), // if false
                         () -> distance.getTarget() == DistanceSubsystem.Targets.Right
                 ),
                 new DriveSeconds(drive, 0, "stop", imu, false),
-                new DriveSeconds(drive, 1000, "down", imu, false),
+                //new DriveSeconds(drive, 500, "down", imu, false),
                 // We should now be centered between the spike marks
                 new DriveSeconds(drive, 0, "stop", imu, false),
+                // TODO: We should now be centered between the spike marks
                 new SelectCommand(
                         new HashMap<Object, Command>() {{
                                 put(DistanceSubsystem.Targets.Right, new SequentialCommandGroup(
+                                        //new DriveSeconds(drive, 600, "down", imu, false),
+                                        //new DriveSeconds(drive, 0, "stop", imu, false),
                                         new RotateDrive(drive, 90.0),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
                                         // Back up to put intake at left spike mark
@@ -143,29 +151,34 @@ public class AutonomousRedScoring extends CommandOpMode {
                                 ));
                                 put(DistanceSubsystem.Targets.Center, new SequentialCommandGroup(
                                         // Bump the prop out of the way and return
-                                        new DriveSeconds(drive, 200, "down", imu, false),
+                                        new DriveSeconds(drive, 700, "down", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
-                                        new DriveSeconds(drive, 200, "up", imu, false),
+                                        new DriveSeconds(drive, 250, "up", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false)
                                 ));
                                 put(DistanceSubsystem.Targets.Left, new SequentialCommandGroup(
+                                        new DriveSeconds(drive, 300, "down", imu, false),
+                                        new DriveSeconds(drive, 0, "stop", imu, false),
                                         // Face right spike, bump prop and return
                                         new RotateDrive(drive, 90.0),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
                                         new DriveSeconds(drive, 400, "down", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false),
-                                        new DriveSeconds(drive, 100, "up", imu, false),
+                                        new DriveSeconds(drive, 425, "up", imu, false),
                                         new DriveSeconds(drive, 0, "stop", imu, false)
                                 ));
                             }},
                         distance::getTarget
                 ),
                 // Deposit 1 pixel
+                new LiftByEncoder(lift, -200),
+                new StopLiftAutonomous(lift),
                 new ParallelRaceGroup(
-                        new TimerCommand(1500), // Adjust to only be 1 pixel
+                        new TimerCommand(1750), // Adjust to only be 1 pixel
                         new GripperGrab(gripper)
                 ),
                 new GripperStop(gripper),
+                /*
                 // Center on square 1 closer to backdrop than spike marks
                 new SelectCommand(
                         new HashMap<Object, Command>() {{
@@ -205,7 +218,7 @@ public class AutonomousRedScoring extends CommandOpMode {
                 new TimerCommand(2000),
                 new ParallelRaceGroup(
                         new DriveSeconds(drive, 15000, "down", imu, false, 0.15),
-                        new TargetProximity(distance, 3.5)
+                        new TargetProximity(distance, 4)
                 ),
                 new DriveSeconds(drive, 0, "stop", imu, false),
                 // Add strafing logic ...
@@ -232,10 +245,11 @@ public class AutonomousRedScoring extends CommandOpMode {
                 new GripperStop(gripper),
                 new DriveSeconds(drive, 200, "up", imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false),
+                 */
                 new RotateDrive(drive, 0),
-                new DriveSeconds(drive, 0, "stop", imu, false),
-                new DriveSeconds(drive, parkDuration, parkDir, imu, false),
                 new DriveSeconds(drive, 0, "stop", imu, false)
+                // new DriveSeconds(drive, parkDuration, parkDir, imu, false),
+                // new DriveSeconds(drive, 0, "stop", imu, false)
         );
         schedule(driving);
     }
