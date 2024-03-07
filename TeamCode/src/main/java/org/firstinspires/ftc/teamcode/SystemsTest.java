@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.util.Timing;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import java.util.concurrent.TimeUnit;
 
 @TeleOp
 public class SystemsTest extends CommandOpMode {
@@ -23,10 +27,23 @@ public class SystemsTest extends CommandOpMode {
     private CRServoForward c_intakeForward;
     private CRServoBackward c_intakeBackward;
     private CRServoStop c_intakeStop;
+    private ServoSubsystem launcher, cover;
+    private Button launcherRelease;
+    private ServoSetPosition c_launcherRelease;
+    private ServoTogglePosition c_cover;
+    private LEDSubsystem led;
+    private LEDSetPattern c_alliance, c_chase;
 
     public void initialize() {
         driverOp = new GamepadEx(gamepad1);
         toolOp = new GamepadEx(gamepad2);
+
+        //LED
+        led = new LEDSubsystem(hardwareMap, "LIGHTS");
+        c_alliance = new LEDSetPattern(led, RevBlinkinLedDriver.BlinkinPattern.BLUE);
+        c_chase = new LEDSetPattern(led, RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_BLUE);
+        led.setDefaultCommand(c_alliance);
+
         //Hanging
         hang = new MotorSubsystem(
                 hardwareMap,
@@ -80,5 +97,16 @@ public class SystemsTest extends CommandOpMode {
         intakeForward.whenHeld(c_intakeForward);
         intakeBackward.whenHeld(c_intakeBackward);
         intake.setDefaultCommand(c_intakeStop);
+
+        //Launcher
+        launcher = new ServoSubsystem(hardwareMap, "DRONE");
+        cover = new ServoSubsystem(hardwareMap, "COVER");
+        launcherRelease = new GamepadButton(driverOp, GamepadKeys.Button.RIGHT_STICK_BUTTON);
+        c_launcherRelease = new ServoSetPosition(launcher, 0.1);
+        c_cover = new ServoTogglePosition(cover, 0.05, 0.1);
+        cover.setPosition(0.05); //set to closed by default at initialization\
+        launcherRelease.whenPressed(
+                new SequentialCommandGroup(c_cover, c_launcherRelease, c_cover)
+        );
     }
 }
