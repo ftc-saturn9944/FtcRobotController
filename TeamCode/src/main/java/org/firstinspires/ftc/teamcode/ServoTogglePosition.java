@@ -13,10 +13,11 @@ public class ServoTogglePosition extends CommandBase {
         addRequirements(subsystem);
     }
     public void initialize(){
-        if (servo.getPosition()==position1){
+        double precision = 0.0001;
+        if (Math.abs(servo.getPosition()-position1) < precision){
             target = position2;
         }
-        else if (servo.getPosition()==position2) {
+        else if (Math.abs(servo.getPosition()-position2) < precision){
             target = position1;
         }
         else{
