@@ -1,20 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.util.Timing;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import java.util.concurrent.TimeUnit;
-
-@TeleOp(name = "Systems Test Red")
-public class SystemsTest extends CommandOpMode {
+@TeleOp
+public class SystemsTestBlue extends CommandOpMode {
     private GamepadEx driverOp,toolOp;
     private Button hangRaise,hangLower;
     private Button armRaise,armLower;
@@ -24,7 +18,7 @@ public class SystemsTest extends CommandOpMode {
 
     public void initialize() {
         robot = new RobotSetup(
-                "red",
+                "blue",
                 hardwareMap
         );
         telemetry.setAutoClear(false);
@@ -67,15 +61,12 @@ public class SystemsTest extends CommandOpMode {
         robot.cover.setPosition(0.05); //set to closed by default at initialization
         launcherRelease = new GamepadButton(driverOp, GamepadKeys.Button.RIGHT_STICK_BUTTON);
         launcherRelease.whenPressed(robot.launcherRelease);
-
-
     }
     @Override
     public void run(){
         telemetry.clearAll();
         telemetry.addData("cover",robot.cover::getPosition);
         telemetry.addData("coverTarget",robot.launcherRelease::coverTarget);
-        telemetry.addData("dist1", robot.dist1::getDistance);
 
         telemetry.update();
         super.run();
