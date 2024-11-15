@@ -18,6 +18,10 @@ public class MotorSubsystem extends SubsystemBase {
         motor.setZeroPowerBehavior(ZeroPower);
 
     }
+
+    public int getEncoder() {
+        return motor.getCurrentPosition();
+    }
     public void raise(){
         motor.set(liftPower);
     }
