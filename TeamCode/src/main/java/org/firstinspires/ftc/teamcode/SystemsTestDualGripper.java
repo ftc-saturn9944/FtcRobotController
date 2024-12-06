@@ -85,6 +85,8 @@ public class SystemsTestDualGripper extends CommandOpMode {
         wristCenter.whenPressed(robot.wristCenter);
         wristScore.whenPressed(robot.wristScore);
 
+        robot.wrist.setPosition(0.45);
+
     }
     @Override
     public void run(){

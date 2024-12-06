@@ -36,4 +36,8 @@ public class MotorSubsystem extends SubsystemBase {
             motor.set(stopPower);
         }
     }
+
+    public void resetEncoder() {
+        motor.resetEncoder();
+    }
 }

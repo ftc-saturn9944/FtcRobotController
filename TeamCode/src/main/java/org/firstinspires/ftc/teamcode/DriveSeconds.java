@@ -59,12 +59,12 @@ public class DriveSeconds extends CommandBase {
                 break;
             case "up":
                 m_strafe = 0;
-                m_forward = -m_power;
+                m_forward = +m_power;
                 m_rotation = 0;
                 break;
             case "down":
                 m_strafe = 0;
-                m_forward = +m_power;
+                m_forward = -m_power;
                 m_rotation = 0;
                 break;
             case "stop":
@@ -81,7 +81,7 @@ public class DriveSeconds extends CommandBase {
         return m_timer.done();
     }
 
-    public void end() {
+    public void end(boolean interrupted) {
         m_drive.drive(0,0,0, false, m_imu, m_field);
     }
 

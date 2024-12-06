@@ -5,6 +5,8 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 
+import java.lang.reflect.Array;
+
 public class MecanumSubsystem extends SubsystemBase {
 
     private final MecanumDrive m_drive;
@@ -82,6 +84,15 @@ public class MecanumSubsystem extends SubsystemBase {
         } else {
             m_drive.driveRobotCentric(strafe, forward, turn, square);
         }
+    }
+
+    public String getEncoders() {
+        return String.format(
+                "LF: %i, RF: %i, LR: %i, RR: %i",
+                m_leftFront.getCurrentPosition(),
+                m_rightFront.getCurrentPosition(),
+                m_leftRear.getCurrentPosition(),
+                m_rightRear.getCurrentPosition());
     }
 
     // Rotation code

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -26,6 +27,12 @@ public class ParkLeftDual extends CommandOpMode {
         // Driving
         driving = new SequentialCommandGroup();
         driving.addCommands(
+                new ParallelRaceGroup(
+                        new TimerCommand(500),
+                        robot.mwristRaise
+                ),
+                new TimerCommand(10000
+                ),
                 new DriveSeconds(
                         robot.drive,
                         0,
