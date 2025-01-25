@@ -68,8 +68,8 @@ public class SystemsTestDualGripper extends CommandOpMode {
         armLower.whenHeld(robot.armLower);
 
         //Arm Rotation
-        armUp = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_UP);
-        armDown = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_DOWN);
+        armUp = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_DOWN);
+        armDown = new GamepadButton(toolOp, GamepadKeys.Button.DPAD_UP);
         armUp.whenHeld(robot.mwristRaise);
         armDown.whenHeld(robot.mwristLower);
 
@@ -85,7 +85,7 @@ public class SystemsTestDualGripper extends CommandOpMode {
         wristCenter.whenPressed(robot.wristCenter);
         wristScore.whenPressed(robot.wristScore);
 
-        robot.wrist.setPosition(0.45);
+//        robot.wrist.setPosition(0.45);
 
     }
     @Override
@@ -93,6 +93,10 @@ public class SystemsTestDualGripper extends CommandOpMode {
         telemetry.clearAll();
         telemetry.addData("Arm Rotation Enc", robot.mwrist::getEncoder);
         telemetry.addData("Arm Extension Enc", robot.arm::getEncoder);
+        telemetry.addData("LFront Enc", robot.drive::getEncoderLFront);
+        telemetry.addData("LRear Enc", robot.drive::getEncoderLRear); // Center turn
+        telemetry.addData("RFront Enc", robot.drive::getEncoderRFront); // Right side
+        telemetry.addData("RRear Enc", robot.drive::getEncoderRRear); // left side
         telemetry.update();
         super.run();
 

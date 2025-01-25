@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelRaceGroup;
@@ -29,7 +28,7 @@ public class AutoRightDual extends CommandOpMode {
 
         robot.mwrist.resetEncoder();
         robot.arm.resetEncoder();
-        robot.wrist.setPosition(0.45);
+        robot.wrist.setPosition(.1);
         //Driving
 //        driving = new SequentialCommandGroup();
 //        driving.addCommands(
@@ -69,8 +68,9 @@ public class AutoRightDual extends CommandOpMode {
 
         test = new SequentialCommandGroup();
         test.addCommands(
+                new TimerCommand(delay),
                 // Ensure servo is locked
-                robot.wristScore,
+                robot.wristCenter,
                 // Lift arm to correct location
                 new MotorByEncoder(
                         robot.mwrist,
@@ -82,7 +82,7 @@ public class AutoRightDual extends CommandOpMode {
                 ),
                 new DriveSeconds(
                         robot.drive,
-                        450,
+                        515,
                         "up",
                         robot.imu,
                         false
@@ -108,7 +108,7 @@ public class AutoRightDual extends CommandOpMode {
                 new TimerCommand(800),
                 new DriveSeconds(
                         robot.drive,
-                        150,
+                        160,
                         "up",
                         robot.imu,
                         false
@@ -121,12 +121,17 @@ public class AutoRightDual extends CommandOpMode {
                 new TimerCommand(1500),
                 new MotorByEncoder(
                         robot.mwrist,
-                        6460
+                        6300
+                ),
+                new TimerCommand(delay),
+                new MotorByEncoder(
+                        robot.arm,
+                        3600
                 ),
                 new TimerCommand(1500),
                 new DriveSeconds(
                         robot.drive,
-                        200,
+                        300,
                         "down",
                         robot.imu,
                         false

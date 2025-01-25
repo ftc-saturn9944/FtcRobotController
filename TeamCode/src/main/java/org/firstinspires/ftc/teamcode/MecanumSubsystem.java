@@ -86,13 +86,18 @@ public class MecanumSubsystem extends SubsystemBase {
         }
     }
 
-    public String getEncoders() {
-        return String.format(
-                "LF: %i, RF: %i, LR: %i, RR: %i",
-                m_leftFront.getCurrentPosition(),
-                m_rightFront.getCurrentPosition(),
-                m_leftRear.getCurrentPosition(),
-                m_rightRear.getCurrentPosition());
+     public int getEncoderLFront() {
+               return m_leftFront.getCurrentPosition();
+
+    }
+    public int getEncoderRFront(){
+               return m_rightFront.getCurrentPosition();
+    }
+    public int getEncoderLRear(){
+               return m_leftRear.getCurrentPosition();
+    }
+    public int getEncoderRRear(){
+               return m_rightRear.getCurrentPosition();
     }
 
     // Rotation code

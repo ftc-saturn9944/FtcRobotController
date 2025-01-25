@@ -62,7 +62,7 @@ public class RobotSetupDual {
         hang = new MotorSubsystem(
                 hmap,
                 "HANGMOTOR",
-                0.8, -0.5, 0,
+                0.8, -0.6, 0,
                 Motor.GoBILDA.RPM_117,
                 Motor.ZeroPowerBehavior.BRAKE
         );
@@ -77,8 +77,8 @@ public class RobotSetupDual {
         arm = new MotorSubsystem(
                 hmap,
                 "LIFTMOTOR",
-                1.0, -1.0, 0,
-                Motor.GoBILDA.RPM_117,
+                1.0, -.8, 0,
+                Motor.GoBILDA.RPM_312,
                 Motor.ZeroPowerBehavior.BRAKE
         );
         armRaise = new MotorRaise(arm);
@@ -121,7 +121,7 @@ public class RobotSetupDual {
         //Wrist
         wrist = new ServoSubsystem(hmap, "WRIST");
         wristCenter = new ServoSetPosition(wrist, 0.1);
-        wristScore = new ServoSetPosition(wrist, .45);
+        wristScore = new ServoSetPosition(wrist, .44);
 
 
 
