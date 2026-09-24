@@ -10,17 +10,18 @@ import com.pedropathing.revhub.localizers.ThreeWheelIMULocalizer;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Constants {
-    // FIXME(kim 09/23/26): These need values which we get from running their respective auto tuners, they need to be added manually. look at the pedro docs for each one to see how to do that.
+    // FIXME(kim 09/23/26): These need values which we get from running their respective auto tuners. look at the pedro docs for each one to see how to do that.
     //  https://pedropathing.com/docs/pathing/tuning
     public static MecanumConfig drivetrainConfig;
     public static ThreeWheelIMUConfig localizerConfig;
     public static ForesightConfig foresightConfig;
 
     public static Follower create(HardwareMap h) {
-        return new Follower(
-                new ThreeWheelIMULocalizer(h, localizerConfig),
-                new Mecanum(h, drivetrainConfig),
-                new Foresight(foresightConfig)
-        );
+//        return new Follower(
+//                new ThreeWheelIMULocalizer(h, localizerConfig),
+//                new Mecanum(h, drivetrainConfig),
+//                new Foresight(foresightConfig)
+//        );
+        return null;
     }
 }
